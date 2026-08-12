@@ -1,0 +1,25 @@
+{
+  "name": "izhar-os",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IZHAR OS — a personal developer workspace, built as an operating system.",
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,mjs,json,css,md}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,mjs,json,css,md}\" --ignore-path .gitignore",
+    "clean": "turbo run clean"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "turbo": "^2.10.9",
+    "typescript": "^5.9.3"
+  }
+}

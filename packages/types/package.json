@@ -1,0 +1,21 @@
+{
+  "name": "@izhar-os/types",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Framework-agnostic domain types shared across IZHAR OS apps, packages and services.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "clean": "node ../../tooling/clean.mjs",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@izhar-os/eslint-config": "workspace:*",
+    "@izhar-os/tsconfig": "workspace:*",
+    "eslint": "^9.39.5",
+    "typescript": "^5.9.3"
+  }
+}

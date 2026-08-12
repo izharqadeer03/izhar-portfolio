@@ -1,0 +1,104 @@
+'use client';
+
+import { searchApplications } from '@izhar-os/config';
+import type { ApplicationDefinition } from '@izhar-os/types';
+import { useCallback, useMemo, useState } from 'react';
+
+import { useWindowStore } from '@/lib/store/window-store';
+
+export interface LauncherSearch {
+  query: string;
+  setQuery: (value: string) => void;
+  results: ApplicationDefinition[];
+  /** Index of the visually highlighted result. */
+  highlight: number;
+  setHighlight: (index: number) => void;
+  /** The highlighted application, if there is one. */
+  active: ApplicationDefinition | undefined;
+  /** Opens an application and closes the launcher. */
+  launch: (application: ApplicationDefinition) => void;
+  /** Arrow / Home / End / Enter handling. Attach to the search field. */
+  handleKeyDown: (event: React.KeyboardEvent) => void;
+}
+
+interface LauncherOptions {
+  /** Results per row, so ArrowUp/ArrowDown move by a row rather than an item. */
+  columns: number;
+  onLaunch: () => void;
+}
+
+/**
+ * Search, highlight and keyboard navigation for a launcher.
+ *
+ * The Start menu, Launchpad and the Activities overview look nothing alike and
+ * behave identically: focus stays in the search field for the whole session,
+ * the arrow keys drive a visual highlight rather than real focus, and Enter
+ * opens whatever is highlighted. Sharing the behaviour is what keeps the three
+ * launchers from drifting into three different ideas of how search works.
+ */
+export function useLauncherSearch({ columns, onLaunch }: LauncherOptions): LauncherSearch {
+  const openWindow = useWindowStore((state) => state.openWindow);
+
+  const [query, setQueryValue] = useState('');
+  const [highlight, setHighlight] = useState(0);
+
+  const results = useMemo(() => searchApplications(query), [query]);
+  const active = results[highlight];
+
+  const setQuery = useCallback((value: string) => {
+    setQueryValue(value);
+    // Refiling the results always re-aims at the best match.
+    setHighlight(0);
+  }, []);
+
+  const launch = useCallback(
+    (application: ApplicationDefinition) => {
+      openWindow(application.id);
+      onLaunch();
+    },
+    [onLaunch, openWindow],
+  );
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (results.length === 0) return;
+
+      const move = (delta: number) => {
+        event.preventDefault();
+        setHighlight((index) => Math.min(results.length - 1, Math.max(0, index + delta)));
+      };
+
+      switch (event.key) {
+        case 'ArrowRight':
+          move(1);
+          break;
+        case 'ArrowLeft':
+          move(-1);
+          break;
+        case 'ArrowDown':
+          move(columns);
+          break;
+        case 'ArrowUp':
+          move(-columns);
+          break;
+        case 'Home':
+          event.preventDefault();
+          setHighlight(0);
+          break;
+        case 'End':
+          event.preventDefault();
+          setHighlight(results.length - 1);
+          break;
+        case 'Enter':
+          event.preventDefault();
+          if (active) launch(active);
+          break;
+        default:
+          break;
+      }
+    },
+    [active, columns, launch, results.length],
+  );
+
+  return { query, setQuery, results, highlight, setHighlight, active, launch, handleKeyDown };
+}

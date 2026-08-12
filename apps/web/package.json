@@ -1,0 +1,42 @@
+{
+  "name": "@izhar-os/web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IZHAR OS — the desktop environment.",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "clean": "node ../../tooling/clean.mjs",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@izhar-os/config": "workspace:*",
+    "@izhar-os/types": "workspace:*",
+    "@izhar-os/ui": "workspace:*",
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
+    "geist": "^1.7.2",
+    "lucide-react": "^1.31.0",
+    "motion": "^13.1.0",
+    "next": "^16.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "three": "^0.185.1",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@izhar-os/eslint-config": "workspace:*",
+    "@izhar-os/tsconfig": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@types/three": "^0.185.4",
+    "eslint": "^9.39.5",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
+  }
+}

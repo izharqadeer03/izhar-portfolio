@@ -1,0 +1,24 @@
+{
+  "name": "@izhar-os/config",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static system configuration for IZHAR OS — identity, application manifest and design tokens.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "clean": "node ../../tooling/clean.mjs",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@izhar-os/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@izhar-os/eslint-config": "workspace:*",
+    "@izhar-os/tsconfig": "workspace:*",
+    "eslint": "^9.39.5",
+    "typescript": "^5.9.3"
+  }
+}
