@@ -5,7 +5,7 @@ import type { EnvironmentId } from '@izhar-os/types';
 import { cn, StatusDot } from '@izhar-os/ui';
 import { motion } from 'motion/react';
 
-import { useEnvironment } from '@/hooks/useEnvironment';
+import { useEnvironment, useEnvironmentMotion } from '@/hooks/useEnvironment';
 import { usePrefersReducedMotion } from '@/hooks/useSystemPreferences';
 
 /**
@@ -48,6 +48,7 @@ const PLACEMENT: Record<EnvironmentId, { position: string; surface: string; radi
 export function ProfileWidget() {
   const environment = useEnvironment();
   const placement = PLACEMENT[environment];
+  const motionSpec = useEnvironmentMotion();
   const reducedMotion = usePrefersReducedMotion();
 
   return (
@@ -61,9 +62,17 @@ export function ProfileWidget() {
         placement.radius,
       )}
       style={{ boxShadow: '0 22px 50px -22px rgba(0,0,0,0.85)' }}
-      initial={{ opacity: 0, y: reducedMotion ? 0 : 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reducedMotion ? 0.12 : 0.5, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      initial={{
+        opacity: 0,
+        y: reducedMotion ? 0 : motionSpec.rise,
+        scale: reducedMotion ? 1 : motionSpec.scaleFrom,
+      }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        duration: reducedMotion ? 0.12 : motionSpec.duration,
+        delay: 0.4,
+        ease: motionSpec.ease,
+      }}
     >
       <p className="text-[12.5px] font-semibold tracking-tight text-fg">{SYSTEM_PROFILE.name}</p>
       <p className="mt-0.5 text-[11.5px] text-muted">{SYSTEM_PROFILE.role}</p>

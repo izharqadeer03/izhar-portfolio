@@ -16,7 +16,7 @@ import { ApplicationSurface } from '@/components/applications/ApplicationRegistr
 import { WindowContent } from '@/components/windows/WindowContent';
 import { WindowHeader } from '@/components/windows/WindowHeader';
 import { usePrefersReducedMotion } from '@/hooks/useSystemPreferences';
-import { useWindowChrome } from '@/hooks/useEnvironment';
+import { useEnvironmentMotion, useWindowChrome } from '@/hooks/useEnvironment';
 import { MOBILE_DOCK_HEIGHT, MOBILE_STATUSBAR_HEIGHT, WINDOW_DRAG_MARGIN } from '@/lib/constants';
 import { getWorkArea, useWindowStore } from '@/lib/store/window-store';
 import { clamp } from '@/lib/utils';
@@ -64,6 +64,7 @@ export function Window({ instance, isFocused, isMobile }: WindowProps) {
 
   const application = getApplication(applicationId);
   const chrome = useWindowChrome();
+  const motionSpec = useEnvironmentMotion();
   const frameRef = useRef<HTMLDivElement>(null);
   const [gesture, setGesture] = useState<'drag' | 'resize' | null>(null);
   const reducedMotion = usePrefersReducedMotion();
@@ -283,19 +284,25 @@ export function Window({ instance, isFocused, isMobile }: WindowProps) {
         transformOrigin: '50% 88%',
         // Suppressed mid-gesture; carries the maximize/restore animation, and
         // the reflow that follows an environment switch, otherwise.
+        // Maximize, restore and the reflow after an environment switch all run
+        // on the active environment's own curve.
         transition: gesture
           ? 'none'
-          : 'left 260ms var(--ease-os), top 260ms var(--ease-os), width 260ms var(--ease-os), height 260ms var(--ease-os), border-color 200ms var(--ease-os), border-radius 260ms var(--ease-os), box-shadow 260ms var(--ease-os)',
+          : 'left 260ms var(--ease-env), top 260ms var(--ease-env), width 260ms var(--ease-env), height 260ms var(--ease-env), border-color 200ms var(--ease-env), border-radius 260ms var(--ease-env), box-shadow 260ms var(--ease-env)',
         boxShadow: isFocused
           ? '0 28px 70px -24px rgba(0,0,0,0.92), 0 0 0 1px rgba(255,255,255,0.035), inset 0 1px 0 rgba(255,255,255,0.05)'
           : '0 16px 40px -22px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.03)',
         pointerEvents: isMinimized ? 'none' : 'auto',
       }}
+      // A window opens the way its environment opens windows: Fluent lifts it
+      // into place, macOS grows it from the desktop, GNOME just shows it.
       initial={
         isMobile
           ? { opacity: 0, y: reducedMotion ? 0 : 28 }
-          : { opacity: 0, scale: reducedMotion ? 1 : 0.95 }
+          : { opacity: 0, scale: reducedMotion ? 1 : motionSpec.window.scaleFrom }
       }
+      // `y` is deliberately absent on desktop: that channel carries the drag
+      // motion value, and animating it here would fight the pointer for it.
       animate={
         isMobile
           ? { opacity: isMinimized ? 0 : 1, y: 0 }
@@ -309,7 +316,10 @@ export function Window({ instance, isFocused, isMobile }: WindowProps) {
           ? { opacity: 0, y: reducedMotion ? 0 : 24 }
           : { opacity: 0, scale: reducedMotion ? 1 : 0.97 }
       }
-      transition={{ duration: reducedMotion ? 0.08 : 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+      transition={{
+        duration: reducedMotion ? 0.08 : motionSpec.window.duration,
+        ease: motionSpec.ease,
+      }}
       // Focus can never land inside a minimized window.
       inert={isMinimized}
       onPointerDown={() => focusWindow(id)}

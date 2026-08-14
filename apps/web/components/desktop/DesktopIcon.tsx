@@ -5,6 +5,7 @@ import { cn } from '@izhar-os/ui';
 import type { PointerEvent as ReactPointerEvent, Ref } from 'react';
 
 import { AppTile } from '@/components/applications/AppIcon';
+import { useIconStyle } from '@/hooks/useEnvironment';
 
 interface DesktopIconProps {
   application: ApplicationDefinition;
@@ -43,6 +44,8 @@ export function DesktopIcon({
   className,
   style,
 }: DesktopIconProps) {
+  const iconStyle = useIconStyle();
+
   return (
     <button
       ref={ref}
@@ -57,8 +60,11 @@ export function DesktopIcon({
       onKeyDown={onKeyDown}
       style={style}
       className={cn(
-        'group absolute flex select-none flex-col items-center gap-2 rounded-xl px-1 py-2.5',
-        'border border-transparent transition-[background-color,border-color,opacity] duration-150 ease-os',
+        'group absolute flex select-none flex-col items-center gap-2 px-1 py-2.5',
+        // The selection plate takes the environment's own corner: Fluent's small
+        // radius, macOS's generous one, GNOME's near-square.
+        iconStyle.cellRadiusClass,
+        'border border-transparent transition-[background-color,border-color,opacity] duration-(--dur-env) ease-env',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
         isSelected
           ? 'border-line-strong bg-white/[0.07] backdrop-blur-md'
@@ -69,7 +75,7 @@ export function DesktopIcon({
     >
       <span
         className={cn(
-          'transition-transform duration-200 ease-os',
+          'transition-transform duration-(--dur-env) ease-env',
           'group-hover:-translate-y-0.5 group-active:translate-y-0',
         )}
       >
@@ -77,13 +83,21 @@ export function DesktopIcon({
           icon={application.icon}
           accent={application.accent}
           size={tileSize}
-          className={cn('group-hover:border-line-strong', isSelected && 'border-line-strong')}
+          // Hover and selection brighten the tile rather than restating its
+          // border: each environment already draws its own rim, and overriding
+          // that would flatten a lit Aqua icon into a Yaru chip.
+          className={cn(
+            'transition-[filter] duration-(--dur-env) ease-env',
+            'group-hover:brightness-110',
+            isSelected && 'brightness-110',
+          )}
         />
       </span>
 
       <span
         className={cn(
-          'line-clamp-2 max-w-full text-center text-[11.5px] leading-tight tracking-tight transition-colors duration-150',
+          'line-clamp-2 max-w-full text-center transition-colors duration-150',
+          iconStyle.labelClass,
           // A soft shadow keeps labels legible wherever they land on the environment.
           '[text-shadow:0_1px_3px_rgba(0,0,0,0.85)]',
           isSelected ? 'text-fg' : 'text-fg/80 group-hover:text-fg',

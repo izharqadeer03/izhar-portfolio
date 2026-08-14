@@ -8,8 +8,8 @@ import type { OperatingSystemMeta, PlatformEntry, SystemProfile } from '@izhar-o
 export const OS_META: OperatingSystemMeta = {
   name: 'IZHAR OS',
   shortName: 'IZ',
-  version: '1.5.0',
-  channel: 'Phase 1.5 — Environments',
+  version: '1.6.0',
+  channel: 'Phase 2 — Applications',
   description: 'Personal Developer Workspace',
 };
 
@@ -17,10 +17,13 @@ export const SYSTEM_PROFILE: SystemProfile = {
   name: 'Izhar Qadeer',
   wordmark: 'IZHAR',
   role: 'Full Stack Developer',
-  disciplines: ['Frontend', 'Backend', 'AI / LLM'],
+  // Ordered by depth, not by breadth: the title says what the work spans, the
+  // disciplines say where the expertise is — and backend leads.
+  disciplines: ['Backend', 'Full Stack', 'AI / LLM'],
   location: 'India',
   tagline: 'Welcome to my workspace.',
-  statement: 'Building scalable products, real-time systems and intelligent applications.',
+  statement:
+    'Building scalable APIs, realtime services and AI-powered systems in Golang and Node.js — and the Next.js and React interfaces on top of them.',
   experience: '3+ Years',
   status: {
     state: 'available',
@@ -46,7 +49,7 @@ export const PLATFORM_ENTRIES: PlatformEntry[] = [
 /** Roadmap surfaced in System Information so the OS explains its own phases. */
 export const ROADMAP: { label: string; detail: string; done: boolean }[] = [
   { label: 'Phase 1', detail: 'Workspace, window manager, environment', done: true },
-  { label: 'Phase 1.5', detail: 'Windows, macOS and Linux environments', done: true },
+  { label: 'Phase 1.5', detail: 'Windows, macOS and Ubuntu environments', done: true },
   { label: 'Phase 2', detail: 'Portfolio applications and content', done: false },
   { label: 'Phase 3', detail: 'AI Lab and assistant services', done: false },
 ];

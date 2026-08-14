@@ -2,8 +2,35 @@ import { OS_META, SYSTEM_PROFILE } from '@izhar-os/config';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
+import { Inter, Ubuntu, Ubuntu_Mono } from 'next/font/google';
 
 import './globals.css';
+
+/**
+ * Three voices, one document.
+ *
+ * IZHAR OS is set in Geist; each environment then borrows the *voice* of the
+ * desktop it quotes. The stacks in globals.css ask for the real system font
+ * first, so nobody downloads a typeface their machine already ships — these
+ * are the fallbacks that make the difference visible on the machines that
+ * don't: Ubuntu's own family for the Ubuntu environment, and Inter standing in
+ * for Segoe and SF where neither is installed.
+ */
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+
+const ubuntu = Ubuntu({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700'],
+  variable: '--font-ubuntu',
+  display: 'swap',
+});
+
+const ubuntuMono = Ubuntu_Mono({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-ubuntu-mono',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -40,7 +67,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html
+      lang="en"
+      className={`${GeistSans.variable} ${GeistMono.variable} ${inter.variable} ${ubuntu.variable} ${ubuntuMono.variable}`}
+    >
       <body className="bg-void text-fg antialiased">{children}</body>
     </html>
   );

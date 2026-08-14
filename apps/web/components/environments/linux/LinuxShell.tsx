@@ -11,7 +11,7 @@ interface LinuxShellProps {
 }
 
 /**
- * The Linux environment's chrome.
+ * The Ubuntu environment's chrome.
  *
  * Panel across the top, dock down the left, Activities over everything — the
  * GNOME Shell arrangement Ubuntu ships. It is the only one of the three that

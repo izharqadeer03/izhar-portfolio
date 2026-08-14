@@ -5,8 +5,9 @@ import type { EnvironmentId } from '@izhar-os/types';
 import { cn, StatusDot } from '@izhar-os/ui';
 import { motion } from 'motion/react';
 
-import { useEnvironment } from '@/hooks/useEnvironment';
-import { usePrefersReducedMotion } from '@/hooks/useSystemPreferences';
+import { useEnvironment, useEnvironmentMotion } from '@/hooks/useEnvironment';
+import { useIconField } from '@/hooks/useIconField';
+import { useIsMobile, usePrefersReducedMotion } from '@/hooks/useSystemPreferences';
 
 interface IdentityStyle {
   /** Position within the desktop surface. */
@@ -18,11 +19,14 @@ interface IdentityStyle {
   statement: string;
 }
 
+/** Gap left between the identity block and the icon field, in pixels. */
+const ICON_FIELD_GAP = 32;
+
 /**
  * The same five facts, arranged in each environment's own voice.
  *
  * Windows centres them and leans on weight; macOS lifts them, thins them and
- * gives them air; Linux left-aligns them and sets them in mono, the way a
+ * gives them air; Ubuntu left-aligns them and sets them in mono, the way a
  * developer's desktop reads. Nothing is added or removed between the three —
  * that is the point.
  */
@@ -44,7 +48,11 @@ const STYLES: Record<EnvironmentId, IdentityStyle> = {
     statement: 'mt-7 max-w-[38ch] text-center text-[14px] font-light leading-relaxed',
   },
   linux: {
-    wrapper: 'left-0 top-[24%] items-start ps-2 pe-6 text-left',
+    // Left-aligned like a tiling desktop, but starting *after* the icon field —
+    // the inline start padding is supplied at render time from the field's own
+    // measured width, so a denser grid pushes the text rather than colliding
+    // with it.
+    wrapper: 'inset-x-0 top-[24%] items-start pe-6 text-left',
     align: 'start',
     name: 'font-mono text-[clamp(1.6rem,3.6vw,2.5rem)] font-semibold tracking-[-0.01em]',
     role: 'mt-2 font-mono text-[12px] tracking-[0.2em] uppercase',
@@ -64,17 +72,56 @@ const STYLES: Record<EnvironmentId, IdentityStyle> = {
 export function DesktopIdentity() {
   const environment = useEnvironment();
   const style = STYLES[environment];
+  const motionSpec = useEnvironmentMotion();
   const reducedMotion = usePrefersReducedMotion();
+  const isMobile = useIsMobile();
+  const field = useIconField();
+
+  /**
+   * Room the icon field has already claimed.
+   *
+   * On a phone the field fills the top, so the identity starts below it. On a
+   * desktop it runs down one edge: a centred block reserves that width on
+   * *both* sides so it stays centred on the screen while never reaching the
+   * icons, and a left-aligned one simply begins after them. Either way the two
+   * never share a pixel, in any environment, at any density.
+   */
+  const reserved = field.reservedWidth + ICON_FIELD_GAP;
+  const clearance: React.CSSProperties = isMobile
+    ? { top: field.reservedHeight + ICON_FIELD_GAP }
+    : style.align === 'center'
+      ? { paddingInline: reserved }
+      : field.origin === 'right'
+        ? { paddingInlineEnd: reserved }
+        : { paddingInlineStart: reserved };
+
+  // A phone has one column and no icon field beside it, so every environment's
+  // block centres there — including the ones that left-align on a desktop.
+  const align = isMobile ? 'center' : style.align;
 
   const rise = (delay: number) => ({
-    initial: { opacity: 0, y: reducedMotion ? 0 : 10 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: reducedMotion ? 0.12 : 0.6, delay, ease: [0.16, 1, 0.3, 1] as const },
+    initial: {
+      opacity: 0,
+      y: reducedMotion ? 0 : motionSpec.rise,
+      scale: reducedMotion ? 1 : motionSpec.scaleFrom,
+    },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    transition: {
+      duration: reducedMotion ? 0.12 : motionSpec.duration,
+      delay,
+      ease: motionSpec.ease,
+    },
   });
 
   return (
     <div
-      className={cn('pointer-events-none absolute z-10 flex flex-col select-none', style.wrapper)}
+      className={cn(
+        'pointer-events-none absolute z-10 flex flex-col select-none',
+        // On a phone the identity is placed below the icon grid, so its own
+        // vertical anchor is dropped.
+        isMobile ? 'inset-x-0 items-center px-6 text-center' : style.wrapper,
+      )}
+      style={clearance}
     >
       <motion.h1 key={`${environment}-name`} {...rise(0.05)} className={cn('text-fg', style.name)}>
         {SYSTEM_PROFILE.name}
@@ -91,7 +138,11 @@ export function DesktopIdentity() {
       <motion.p
         key={`${environment}-disciplines`}
         {...rise(0.16)}
-        className={cn('flex flex-wrap items-center text-muted', style.disciplines)}
+        className={cn(
+          'flex flex-wrap items-center text-muted',
+          style.disciplines,
+          isMobile && 'justify-center',
+        )}
       >
         {SYSTEM_PROFILE.disciplines.map((discipline, index) => (
           <span key={discipline} className="flex items-center gap-3">
@@ -106,7 +157,10 @@ export function DesktopIdentity() {
       <motion.p
         key={`${environment}-statement`}
         {...rise(0.21)}
-        className={cn('text-faint', style.statement)}
+        className={cn(
+          'text-faint',
+          isMobile ? 'mt-5 max-w-[38ch] text-center text-[13.5px]' : style.statement,
+        )}
       >
         {SYSTEM_PROFILE.statement}
       </motion.p>
@@ -116,7 +170,7 @@ export function DesktopIdentity() {
         {...rise(0.26)}
         className={cn(
           'mt-6 flex items-center gap-2 rounded-full border border-line bg-surface/45 px-3 py-1.5 backdrop-blur-xl',
-          style.align === 'center' ? 'self-center' : 'self-start',
+          align === 'center' ? 'self-center' : 'self-start',
         )}
       >
         <StatusDot state={SYSTEM_PROFILE.status.state} />

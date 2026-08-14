@@ -4,6 +4,7 @@ import { APPLICATIONS, getApplication } from '@izhar-os/config';
 import type { ApplicationDefinition, ApplicationId } from '@izhar-os/types';
 import { createElement, type ComponentType } from 'react';
 
+import { AboutApp } from '@/components/applications/about/AboutApp';
 import { ComingSoonApp } from '@/components/applications/ComingSoonApp';
 import { FilesApp } from '@/components/applications/FilesApp';
 import { SystemInformationApp } from '@/components/applications/SystemInformationApp';
@@ -25,12 +26,13 @@ export interface ApplicationViewProps {
  */
 const APPLICATION_VIEWS: Partial<Record<ApplicationId, ComponentType<ApplicationViewProps>>> = {
   'system-info': SystemInformationApp,
-  // Both of these render themselves differently per environment, and neither
-  // is registered more than once — the environment is read inside the view,
-  // not selected out here.
+  // These render themselves differently per environment, and none is
+  // registered more than once — the environment is read inside the view, not
+  // selected out here.
+  about: AboutApp,
   files: FilesApp,
   terminal: TerminalApp,
-  // Phase 2 registers about / projects / experience / skills / resume / contact.
+  // Phase 2 continues with projects / experience / skills / resume / contact.
   // Phase 3 registers ai-lab.
 };
 

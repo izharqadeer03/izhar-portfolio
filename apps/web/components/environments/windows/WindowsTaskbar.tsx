@@ -61,7 +61,7 @@ export function WindowsTaskbar({
           aria-label={`${OS_META.name} Start`}
           data-tip="Start"
           className={cn(
-            'os-tip grid size-9 place-items-center rounded-md transition-colors duration-150 ease-os',
+            'os-tip grid size-9 place-items-center rounded-md transition-colors duration-150 ease-env',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
             isLauncherOpen
               ? 'env-accent-quiet env-accent'
@@ -94,7 +94,7 @@ export function WindowsTaskbar({
             aria-current={item.isActive}
             data-tip={item.application.title}
             className={cn(
-              'os-tip relative grid size-9 place-items-center rounded-md transition-colors duration-150 ease-os',
+              'os-tip relative grid size-9 place-items-center rounded-md transition-colors duration-150 ease-env',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
               item.isActive ? 'bg-white/[0.11]' : 'hover:bg-white/[0.08]',
               item.isMinimized && 'opacity-70',

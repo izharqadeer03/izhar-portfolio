@@ -130,7 +130,7 @@ function StartPanel({ onClose, triggerRef }: Omit<WindowsStartMenuProps, 'isOpen
                   onPointerEnter={() => launcher.setHighlight(index)}
                   className={cn(
                     'flex w-full flex-col items-center gap-2 rounded-lg border px-2 py-3.5',
-                    'transition-colors duration-150 ease-os',
+                    'transition-colors duration-150 ease-env',
                     index === launcher.highlight
                       ? 'border-line-strong bg-white/[0.08]'
                       : 'border-transparent hover:bg-white/[0.045]',

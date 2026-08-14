@@ -1,11 +1,12 @@
 import {
   APPLICATIONS,
   getApplication,
+  getEnvironment,
   OS_META,
   PORTFOLIO_ENTRIES,
   SYSTEM_PROFILE,
 } from '@izhar-os/config';
-import type { ApplicationId, EnvironmentDefinition } from '@izhar-os/types';
+import type { ApplicationId, EnvironmentDefinition, EnvironmentId } from '@izhar-os/types';
 
 /**
  * The shell's vocabulary.
@@ -65,6 +66,21 @@ function resolveApplication(token: string) {
   );
 }
 
+/**
+ * What `workspace` will answer to.
+ *
+ * The Ubuntu environment's id is still `linux`, and a shell is exactly where
+ * someone would type that — so both spellings resolve, while only `ubuntu` is
+ * advertised in the usage line.
+ */
+const WORKSPACE_ALIASES: Record<string, EnvironmentId | undefined> = {
+  windows: 'windows',
+  macos: 'macos',
+  mac: 'macos',
+  ubuntu: 'linux',
+  linux: 'linux',
+};
+
 const COMMANDS: CommandDefinition[] = [
   {
     name: 'help',
@@ -98,6 +114,8 @@ const COMMANDS: CommandDefinition[] = [
           `  Status      ${SYSTEM_PROFILE.status.label} — ${SYSTEM_PROFILE.status.detail}`,
           'muted',
         ),
+        blank(),
+        line('  Run `open about` for the full application.', 'muted'),
       ],
     }),
   },
@@ -216,7 +234,7 @@ const COMMANDS: CommandDefinition[] = [
   {
     name: 'workspace',
     summary: 'Show or change the environment.',
-    usage: 'workspace [windows|macos|linux]',
+    usage: 'workspace [windows|macos|ubuntu]',
     run: (args, context) => {
       const token = args[0]?.toLowerCase();
       if (!token) {
@@ -225,18 +243,19 @@ const COMMANDS: CommandDefinition[] = [
             line(`Current environment: ${context.environment.name}`, 'accent'),
             line(`  ${context.environment.chromeSummary}`, 'muted'),
             blank(),
-            line('  Available: windows · macos · linux', 'muted'),
+            line('  Available: windows · macos · ubuntu', 'muted'),
           ],
         };
       }
 
-      if (token !== 'windows' && token !== 'macos' && token !== 'linux') {
+      const target = WORKSPACE_ALIASES[token];
+      if (!target) {
         return { lines: [line(`workspace: unknown environment: ${token}`, 'error')] };
       }
 
       return {
-        lines: [line(`Switching to ${token}…`, 'muted')],
-        effect: { type: 'switch', environment: token },
+        lines: [line(`Switching to ${getEnvironment(target).name}…`, 'muted')],
+        effect: { type: 'switch', environment: target },
       };
     },
   },

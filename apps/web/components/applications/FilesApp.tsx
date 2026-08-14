@@ -2,11 +2,11 @@
 
 import { getApplication, SYSTEM_PROFILE } from '@izhar-os/config';
 import type { ApplicationDefinition, ApplicationId } from '@izhar-os/types';
-import { cn, OSButton } from '@izhar-os/ui';
+import { OSButton } from '@izhar-os/ui';
 import { ExternalLink } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
-import { ComingSoonApp } from '@/components/applications/ComingSoonApp';
+import { ApplicationSurface } from '@/components/applications/ApplicationRegistry';
 import { FileListing } from '@/components/applications/files/FileListing';
 import { FileSidebar } from '@/components/applications/files/FileSidebar';
 import { FileToolbar, type ListingView } from '@/components/applications/files/FileToolbar';
@@ -225,8 +225,8 @@ function EntryView({
         </OSButton>
       </div>
 
-      <div className={cn('min-h-0 flex-1')}>
-        <ComingSoonApp application={application} />
+      <div className="min-h-0 flex-1">
+        <ApplicationSurface application={application} />
       </div>
     </div>
   );

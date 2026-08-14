@@ -155,8 +155,10 @@ function DockIcon({ item, pointerX, reducedMotion, onActivate }: DockIconProps) 
           accent={item.application.accent}
           size={BASE_SIZE}
           muted={item.application.status === 'coming-soon'}
-          // The tile itself is fixed-size and scaled by the button, so the
-          // magnification costs one transform rather than a relayout.
+          // The button is the thing the spring resizes; the tile and its glyph
+          // fill it, so the icon magnifies with its frame rather than sitting
+          // fixed-size inside a growing box.
+          fill
           className="size-full"
         />
       </motion.button>

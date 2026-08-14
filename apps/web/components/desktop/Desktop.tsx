@@ -26,7 +26,7 @@ import { useSystemStore } from '@/lib/store/system-store';
  * is active — it publishes that environment's accent as a CSS variable and
  * insets the interactive surface by the chrome it reserves. Everything inside
  * reads those two facts and nothing else, which is why the same icon field and
- * the same window manager serve Windows, macOS and Linux without a branch.
+ * the same window manager serve Windows, macOS and Ubuntu without a branch.
  */
 export function Desktop() {
   const environment = useEnvironment();

@@ -47,10 +47,11 @@ export const ENVIRONMENTS: EnvironmentDefinition[] = [
     },
   },
   {
+    // Id stays `linux`; everything the visitor reads says Ubuntu.
     id: 'linux',
-    name: 'Linux',
-    shortName: 'Linux',
-    logo: 'tux',
+    name: 'Ubuntu',
+    shortName: 'Ubuntu',
+    logo: 'ubuntu',
     tagline: 'Dense, keyboard-first and built for people who read the source.',
     personality: ['Technical', 'Efficient', 'Configurable'],
     chromeSummary: 'Top bar · Dock · Files · Terminal',

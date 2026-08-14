@@ -3,11 +3,13 @@
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 
+import { DesktopWallpaper } from '@/components/desktop/DesktopWallpaper';
 import { SceneBoundary } from '@/components/system/SceneBoundary';
 import { useDeviceCapability } from '@/hooks/useDeviceCapability';
 import { useDocumentVisible } from '@/hooks/useDocumentVisibility';
-import { useEnvironmentDefinition } from '@/hooks/useEnvironment';
+import { useEnvironment, useEnvironmentDefinition } from '@/hooks/useEnvironment';
 import { useSystemStore } from '@/lib/store/system-store';
+import { WALLPAPERS } from '@/lib/wallpaper';
 
 // Three.js stays out of the initial bundle entirely — the boot sequence must
 // never wait on the environment.
@@ -17,49 +19,57 @@ const DesktopScene = dynamic(() => import('@/components/3d/DesktopScene'), {
 });
 
 /**
- * The desktop environment, in two halves.
+ * The desktop environment, in three layers.
  *
- * The CSS layers below are not a fallback bolted on afterwards — they are the
- * environment's foundation, and they render on every device. WebGL composites
- * on top when the machine can afford it. That ordering is what guarantees the
- * desktop looks finished whether or not Three.js ever loads.
+ * The wallpaper is the ground — each environment boots into the stock image its
+ * real counterpart does, because that is what makes a desktop recognisable from
+ * across the table before a single pixel of chrome has been read. The CSS
+ * atmosphere sits on it and the WebGL scene composites over both when the
+ * machine can afford it; neither is a fallback for the other, and the desktop
+ * looks finished whether or not Three.js ever loads.
  *
- * Each workspace tints and structures these layers differently: cool and
- * gridded for Windows, warm and gridless for macOS, aubergine and hard-lined
- * for Linux. This is the one place the environments are allowed to change the
- * colour of the room, because atmosphere is what makes a desktop recognisable
- * from across the table — and it is behind everything, so it never competes
- * with the interface or with the accent.
+ * The generated layers are deliberately quieter now than they were when they
+ * carried the whole room: their strengths come from the wallpaper spec, tuned
+ * per environment so light reads as light falling on the wallpaper rather than
+ * as a wash covering it up.
  */
 export function DesktopBackground() {
   const { budget, useWebGL } = useDeviceCapability();
   const visible = useDocumentVisible();
   const bootPhase = useSystemStore((state) => state.bootPhase);
+  const environmentId = useEnvironment();
   const environment = useEnvironmentDefinition();
   const [sceneFailed, setSceneFailed] = useState(false);
 
   const environmentReady = bootPhase === 'revealing' || bootPhase === 'ready';
   const showScene = useWebGL && environmentReady && !sceneFailed;
   const { ambient } = environment;
+  const wallpaper = WALLPAPERS[environmentId];
+  const gridStrength = ambient.grid * wallpaper.grid;
 
   return (
     <div
       className="os-grain pointer-events-none absolute inset-0 overflow-hidden"
       aria-hidden="true"
     >
-      {/* Ground colour. */}
+      {/* Ground colour, behind the wallpaper: what the first frame paints and
+          what shows through wherever the image has not arrived yet. */}
       <div className="absolute inset-0 bg-void" />
+
+      <DesktopWallpaper />
 
       {/* Two pools of light, drifting slowly against each other. */}
       <div
-        className="absolute -top-[25%] -left-[15%] size-[70vw] rounded-full opacity-70 blur-[100px] transition-[background] duration-700 motion-safe:animate-drift"
+        className="absolute -top-[25%] -left-[15%] size-[70vw] rounded-full blur-[100px] transition-[background,opacity] duration-700 motion-safe:animate-drift"
         style={{
+          opacity: wallpaper.ambient,
           background: `radial-gradient(circle, color-mix(in oklab, ${ambient.primary} 16%, transparent) 0%, transparent 68%)`,
         }}
       />
       <div
-        className="absolute -right-[12%] -bottom-[30%] size-[62vw] rounded-full opacity-60 blur-[110px] transition-[background] duration-700 motion-safe:animate-drift"
+        className="absolute -right-[12%] -bottom-[30%] size-[62vw] rounded-full blur-[110px] transition-[background,opacity] duration-700 motion-safe:animate-drift"
         style={{
+          opacity: wallpaper.ambient * 0.86,
           background: `radial-gradient(circle, color-mix(in oklab, ${ambient.secondary} 14%, transparent) 0%, transparent 68%)`,
           animationDelay: '-13s',
         }}
@@ -67,11 +77,11 @@ export function DesktopBackground() {
 
       {/* Engineering grid, faded out toward the edges so it has no border.
           macOS sets its strength to zero: an unbroken field is the point. */}
-      {ambient.grid > 0 ? (
+      {gridStrength > 0 ? (
         <div
           className="absolute inset-0 transition-opacity duration-700"
           style={{
-            opacity: ambient.grid,
+            opacity: gridStrength,
             backgroundImage:
               'linear-gradient(to right, rgba(255,255,255,0.028) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.028) 1px, transparent 1px)',
             backgroundSize: '68px 68px',

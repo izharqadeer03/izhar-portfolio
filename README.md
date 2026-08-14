@@ -4,7 +4,7 @@ A personal developer workspace, built as an operating system.
 
 The portfolio does not present itself as a set of pages. It boots, draws a
 desktop, and lets a visitor open applications in real windows — in Windows,
-macOS or Linux chrome, chosen at runtime.
+macOS or Ubuntu chrome, chosen at runtime.
 
 ## Requirements
 
@@ -57,7 +57,7 @@ launchers and system menus fork, and they fork in exactly one place —
 The consequence is that applications are written once. Registering a new one
 means appending an entry to the manifest in `packages/config/src/applications.ts`
 and mapping its view in `apps/web/components/applications/ApplicationRegistry.tsx`.
-It then appears in Windows, macOS and Linux at once — on the desktop, in the
+It then appears in Windows, macOS and Ubuntu at once — on the desktop, in the
 launcher, in search, in the file manager and in the terminal.
 
 Configuration is split deliberately. `tooling/` holds build configuration and no
@@ -69,7 +69,7 @@ what lets `@izhar-os/types` be a dependency of `@izhar-os/config` without a cycl
 | Phase     | Scope                                  | Status   |
 | --------- | -------------------------------------- | -------- |
 | Phase 1   | Workspace, window manager, environment | Complete |
-| Phase 1.5 | Windows, macOS and Linux environments  | Complete |
+| Phase 1.5 | Windows, macOS and Ubuntu environments | Complete |
 | Phase 2   | Portfolio applications and content     | Planned  |
 | Phase 3   | AI Lab and assistant services          | Planned  |
 

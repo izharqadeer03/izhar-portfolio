@@ -7,10 +7,18 @@
  * one system, three ways of looking at it.
  */
 
+/**
+ * The three environments, by id.
+ *
+ * `linux` is the *id* of the environment the visitor knows as Ubuntu. The name
+ * lives in the definition below and is the only spelling the interface shows;
+ * the id stays generic because it is also what a returning visitor has in
+ * localStorage and what `workspace` accepts as an alias.
+ */
 export type EnvironmentId = 'windows' | 'macos' | 'linux';
 
 /** Which recognizable mark identifies an environment in the selector. */
-export type EnvironmentLogo = 'windows' | 'apple' | 'tux';
+export type EnvironmentLogo = 'windows' | 'apple' | 'ubuntu';
 
 export interface EnvironmentDefinition {
   id: EnvironmentId;

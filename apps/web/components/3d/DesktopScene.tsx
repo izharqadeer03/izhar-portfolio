@@ -10,6 +10,12 @@ import { DataNodes } from '@/components/3d/DataNodes';
 import { FloatingGeometry } from '@/components/3d/FloatingGeometry';
 import { HorizonGrid } from '@/components/3d/HorizonGrid';
 import { SceneLighting } from '@/components/3d/SceneLighting';
+import { filterUpstreamThreeWarnings } from '@/lib/three-console';
+
+// At import rather than in an effect: fiber builds the clock the deprecation
+// warning comes from while the Canvas below is mounting, which is already too
+// late for anything that runs after the first render.
+filterUpstreamThreeWarnings();
 
 interface DesktopSceneProps {
   budget: SceneBudget;

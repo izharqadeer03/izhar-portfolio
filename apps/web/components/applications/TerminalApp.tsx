@@ -38,7 +38,7 @@ const PROMPT_USER = 'izhar@portfolio';
  *
  * Not a decorative block of green text: it parses input, completes on Tab,
  * walks its history with the arrow keys, and every command reads the same
- * manifest the desktop reads. `workspace linux` switches the entire
+ * manifest the desktop reads. `workspace ubuntu` switches the entire
  * environment from here — which is the clearest possible demonstration that
  * the environment is a layer over the system rather than the system itself.
  */

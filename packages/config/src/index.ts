@@ -14,6 +14,8 @@ export {
   isEnvironmentId,
 } from './environments';
 
+export { ABOUT_PROFILE } from './profile';
+
 export { OS_META, PLATFORM_ENTRIES, ROADMAP, SYSTEM_PROFILE } from './system';
 
 export { BOOT_TIMELINE, MOTION, PALETTE, SCENE_BUDGETS } from './theme';

@@ -122,7 +122,7 @@ function LaunchpadSurface({ onClose }: { onClose: () => void }) {
                 >
                   <span
                     className={cn(
-                      'transition-transform duration-200 ease-os',
+                      'transition-transform duration-200 ease-env',
                       index === launcher.highlight ? 'scale-[1.06]' : 'group-hover:scale-[1.04]',
                     )}
                   >
@@ -131,7 +131,7 @@ function LaunchpadSurface({ onClose }: { onClose: () => void }) {
                       accent={application.accent}
                       size={62}
                       muted={application.status === 'coming-soon'}
-                      className={index === launcher.highlight ? 'border-line-strong' : undefined}
+                      className={index === launcher.highlight ? 'brightness-110' : undefined}
                     />
                   </span>
                   <span className="line-clamp-2 max-w-full text-center text-[12px] text-fg/90 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">

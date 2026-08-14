@@ -40,6 +40,12 @@
   /* A single easing curve for the whole system. */
   --ease-os: cubic-bezier(0.2, 0.8, 0.2, 1);
 
+  /* The *active environment's* curve and tempo. Both are re-declared per
+     environment below; these are the neutral values anything rendered outside
+     a desktop — the boot screen, the first-run gate — animates on. */
+  --ease-env: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-env: 200ms;
+
   --animate-halo: halo 2.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
   --animate-sweep: sweep 1.1s cubic-bezier(0.4, 0, 0.2, 1);
   --animate-drift: drift 26s ease-in-out infinite;
@@ -83,11 +89,39 @@
   }
 }
 
-/* Desktop icons entering — replayed whenever the desktop is refreshed. */
-@keyframes icon-in {
+/* ---------------------------------------------------------------------------
+ * Desktop icons entering — replayed whenever the desktop is refreshed.
+ *
+ * One per environment, because an entrance is a large part of how a desktop
+ * feels: Fluent slides its content up and decelerates hard, macOS grows it the
+ * way Launchpad does, and GNOME barely moves at all before it is finished.
+ * ------------------------------------------------------------------------- */
+@keyframes icon-in-windows {
   from {
     opacity: 0;
-    transform: translateY(6px) scale(0.97);
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes icon-in-macos {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes icon-in-linux {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
   }
   to {
     opacity: 1;
@@ -127,6 +161,51 @@
     --env-accent-quiet: color-mix(in oklab, var(--env-accent) 16%, transparent);
 
     color-scheme: dark;
+  }
+
+  /* -----------------------------------------------------------------------
+   * The active environment's voice and tempo.
+   *
+   * Redeclaring `--font-sans`, `--font-mono`, `--ease-env` and `--dur-env`
+   * inside the desktop root is enough to retype and retime the entire
+   * workspace: every `font-mono`, `ease-env` and `duration-(--dur-env)`
+   * utility below this element resolves against these values instead of the
+   * root ones. No component imports a typeface or an easing curve.
+   *
+   * Each stack asks for the real system font first — a visitor on Windows
+   * genuinely reads Segoe, a visitor on a Mac genuinely reads SF — and falls
+   * back to a webfont with the same voice so the difference is visible
+   * everywhere, on any machine.
+   * --------------------------------------------------------------------- */
+  [data-environment] {
+    font-family: var(--font-sans);
+  }
+
+  [data-environment='windows'] {
+    --font-sans: 'Segoe UI Variable Text', 'Segoe UI', var(--font-inter), var(--font-geist-sans),
+      system-ui, sans-serif;
+    --font-mono: 'Cascadia Mono', Consolas, var(--font-geist-mono), ui-monospace, monospace;
+    /* Fluent's standard decelerate: fast out of the gate, soft on arrival. */
+    --ease-env: cubic-bezier(0, 0, 0, 1);
+    --dur-env: 200ms;
+  }
+
+  [data-environment='macos'] {
+    --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', var(--font-inter),
+      var(--font-geist-sans), system-ui, sans-serif;
+    --font-mono: 'SF Mono', Menlo, var(--font-geist-mono), ui-monospace, monospace;
+    /* Long and gliding — the curve behind every sheet and Dock spring. */
+    --ease-env: cubic-bezier(0.32, 0.72, 0, 1);
+    --dur-env: 320ms;
+  }
+
+  [data-environment='linux'] {
+    --font-sans: var(--font-ubuntu), 'Ubuntu', var(--font-geist-sans), system-ui, sans-serif;
+    --font-mono: var(--font-ubuntu-mono), 'Ubuntu Mono', var(--font-geist-mono), ui-monospace,
+      monospace;
+    /* GNOME's ease-in-out, and the briskest tempo of the three. */
+    --ease-env: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur-env: 150ms;
   }
 
   * {

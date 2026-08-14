@@ -2,92 +2,19 @@
 
 import { DESKTOP_APPLICATIONS } from '@izhar-os/config';
 import type { ApplicationDefinition, ApplicationId } from '@izhar-os/types';
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-} from 'react';
+import { useCallback, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 
 import { DesktopIcon } from '@/components/desktop/DesktopIcon';
-import { useChromeInsets, useDesktopSurface } from '@/hooks/useEnvironment';
+import { useChromeInsets, useEnvironmentMotion } from '@/hooks/useEnvironment';
+import { useIconField } from '@/hooks/useIconField';
 import { useHasFinePointer, useIsMobile } from '@/hooks/useSystemPreferences';
-import { ICON_CELL } from '@/lib/constants';
-import { useSystemStore, type GridCell } from '@/lib/store/system-store';
+import { type PlacedIcon } from '@/lib/icon-grid';
+import { useSystemStore } from '@/lib/store/system-store';
 import { useWindowStore } from '@/lib/store/window-store';
 import { clamp } from '@/lib/utils';
 
-interface PlacedIcon extends GridCell {
-  application: ApplicationDefinition;
-}
-
-const cellKey = (cell: GridCell) => `${cell.col}:${cell.row}`;
 /** Movement past this many pixels turns a press into a drag, not a click. */
 const DRAG_THRESHOLD = 5;
-
-/** Nearest free cell to `desired`, searched outward ring by ring. */
-function findFreeCell(
-  desired: GridCell,
-  occupied: Map<string, ApplicationId>,
-  rowCount: number,
-): GridCell {
-  const start = { col: Math.max(0, desired.col), row: clamp(desired.row, 0, rowCount - 1) };
-  if (!occupied.has(cellKey(start))) return start;
-
-  for (let radius = 1; radius <= 10; radius += 1) {
-    for (let deltaCol = -radius; deltaCol <= radius; deltaCol += 1) {
-      for (let deltaRow = -radius; deltaRow <= radius; deltaRow += 1) {
-        if (Math.max(Math.abs(deltaCol), Math.abs(deltaRow)) !== radius) continue;
-
-        const candidate = { col: start.col + deltaCol, row: start.row + deltaRow };
-        if (candidate.col < 0 || candidate.row < 0 || candidate.row >= rowCount) continue;
-        if (!occupied.has(cellKey(candidate))) return candidate;
-      }
-    }
-  }
-
-  return start;
-}
-
-/**
- * Resolves final cells for every icon: explicitly placed ones keep their spot,
- * everything else flows column-major into the gaps.
- */
-function computeLayout(
-  applications: ApplicationDefinition[],
-  placements: Partial<Record<ApplicationId, GridCell>>,
-  rowCount: number,
-): PlacedIcon[] {
-  const occupied = new Map<string, ApplicationId>();
-  const placed: PlacedIcon[] = [];
-  const flowing: ApplicationDefinition[] = [];
-
-  for (const application of applications) {
-    const requested = placements[application.id];
-    if (!requested) {
-      flowing.push(application);
-      continue;
-    }
-    const cell = findFreeCell(requested, occupied, rowCount);
-    occupied.set(cellKey(cell), application.id);
-    placed.push({ application, ...cell });
-  }
-
-  let cursor = 0;
-  for (const application of flowing) {
-    let cell: GridCell;
-    do {
-      cell = { col: Math.floor(cursor / rowCount), row: cursor % rowCount };
-      cursor += 1;
-    } while (occupied.has(cellKey(cell)));
-
-    occupied.set(cellKey(cell), application.id);
-    placed.push({ application, ...cell });
-  }
-
-  return placed;
-}
 
 /**
  * The desktop icon field.
@@ -105,13 +32,12 @@ function computeLayout(
 export function DesktopIcons() {
   const isMobile = useIsMobile();
   const hasFinePointer = useHasFinePointer();
-  const surface = useDesktopSurface();
   const insets = useChromeInsets();
+  const motion = useEnvironmentMotion();
+  const { layout, cell, tileSize, padding, rowCount, origin } = useIconField();
 
-  const iconDensity = useSystemStore((state) => state.iconDensity);
   const iconsVisible = useSystemStore((state) => state.iconsVisible);
   const desktopEpoch = useSystemStore((state) => state.desktopEpoch);
-  const placements = useSystemStore((state) => state.iconPlacements);
   const selectedIconId = useSystemStore((state) => state.selectedIconId);
   const selectIcon = useSystemStore((state) => state.selectIcon);
   const setIconPlacement = useSystemStore((state) => state.setIconPlacement);
@@ -123,23 +49,12 @@ export function DesktopIcons() {
   const nodesRef = useRef(new Map<ApplicationId, HTMLButtonElement | null>());
   const didDragRef = useRef(false);
 
-  const cell = ICON_CELL[iconDensity];
-  const tileSize = iconDensity === 'comfortable' ? 46 : 38;
-  const padding = surface.iconPadding;
   /** Right-anchored fields count columns leftward from the right edge. */
-  const direction = surface.iconOrigin === 'right' ? -1 : 1;
+  const direction = origin === 'right' ? -1 : 1;
 
-  // Rows that fit inside the work area this environment leaves free.
-  const rowCount = useMemo(() => {
-    if (typeof window === 'undefined') return 6;
-    const usable = window.innerHeight - insets.top - insets.bottom - padding * 2;
-    return Math.max(1, Math.floor(usable / cell.height));
-  }, [cell.height, insets.bottom, insets.top, padding]);
-
-  const layout = useMemo(
-    () => computeLayout(DESKTOP_APPLICATIONS, placements, rowCount),
-    [placements, rowCount],
-  );
+  /** The active environment's entrance, as a CSS shorthand. */
+  const enterAnimation = (index: number) =>
+    `${motion.iconEnter} ${motion.iconEnterDuration}ms var(--ease-env) ${index * motion.stagger}ms backwards`;
 
   /** Keyboard order: down a column, then across — matching what the eye does. */
   const keyboardOrder = useMemo(
@@ -280,7 +195,7 @@ export function DesktopIcons() {
               application={application}
               isSelected={false}
               isDragging={false}
-              tileSize={46}
+              tileSize={tileSize}
               tabIndex={0}
               onClick={() => openWindow(application.id)}
               onDoubleClick={() => openWindow(application.id)}
@@ -288,7 +203,7 @@ export function DesktopIcons() {
                 if (event.key === 'Enter') openWindow(application.id);
               }}
               className="static w-full"
-              style={{ animation: `icon-in 420ms var(--ease-os) ${index * 35}ms backwards` }}
+              style={{ animation: enterAnimation(index) }}
             />
           ))}
         </div>
@@ -334,10 +249,10 @@ export function DesktopIcons() {
             }}
             onKeyDown={(event) => handleKeyDown(event, placedIcon.application, orderIndex)}
             style={{
-              ...(surface.iconOrigin === 'right' ? { right: offset } : { left: offset }),
+              ...(origin === 'right' ? { right: offset } : { left: offset }),
               top: padding + placedIcon.row * cell.height,
               width: cell.width,
-              animation: `icon-in 420ms var(--ease-os) ${index * 35}ms backwards`,
+              animation: enterAnimation(index),
             }}
           />
         );

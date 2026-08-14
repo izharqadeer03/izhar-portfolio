@@ -6,25 +6,35 @@ import type { ApplicationDefinition, ApplicationId } from '@izhar-os/types';
  * manager all read from here, in every environment, so registering a future
  * application (say, "AI Assistant") is a matter of appending one entry and
  * mapping its content component in the web app's ApplicationRegistry. It then
- * appears in Windows, macOS and Linux at once.
+ * appears in Windows, macOS and Ubuntu at once.
  */
 export const APPLICATIONS: ApplicationDefinition[] = [
   {
     id: 'about',
-    title: 'About Me',
+    title: 'About Izhar',
     shortTitle: 'About',
-    description: 'Background, engineering principles and how I work.',
+    description: 'Background, engineering focus and the systems I build.',
     category: 'workspace',
-    status: 'coming-soon',
+    status: 'available',
     accent: 'cyan',
     icon: 'user',
-    keywords: ['bio', 'profile', 'who', 'story', 'me'],
-    defaultSize: { width: 720, height: 520 },
-    minSize: { width: 380, height: 320 },
+    keywords: [
+      'bio',
+      'profile',
+      'who',
+      'story',
+      'me',
+      'izhar',
+      'full stack',
+      'backend',
+      'frontend',
+      'introduction',
+    ],
+    // Wide enough for the navigation pane and the content column side by side.
+    defaultSize: { width: 940, height: 660 },
+    minSize: { width: 420, height: 380 },
     showOnDesktop: true,
     entry: { kind: 'document', name: 'About.txt', typeLabel: 'Text Document' },
-    plannedFeatures: ['Personal introduction', 'Engineering philosophy', 'Timeline of the craft'],
-    plannedRelease: 'Phase 2',
   },
   {
     id: 'projects',

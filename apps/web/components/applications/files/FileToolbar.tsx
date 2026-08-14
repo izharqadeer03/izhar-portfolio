@@ -274,7 +274,7 @@ function FinderToolbar({
   );
 }
 
-/** Linux: the path becomes a row of buttons, GNOME's header-bar idiom. */
+/** Ubuntu: the path becomes a row of buttons, GNOME's header-bar idiom. */
 function NautilusToolbar({
   spec,
   segments,

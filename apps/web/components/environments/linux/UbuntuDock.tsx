@@ -47,7 +47,7 @@ export function UbuntuDock({ isActivitiesOpen, onToggleActivities }: UbuntuDockP
           aria-current={item.isActive}
           data-tip={item.application.title}
           className={cn(
-            'os-tip relative grid size-11 place-items-center rounded-lg transition-colors duration-150 ease-os',
+            'os-tip relative grid size-11 place-items-center rounded-lg transition-colors duration-150 ease-env',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
             item.isActive ? 'bg-white/12' : 'hover:bg-white/8',
             item.isMinimized && 'opacity-70',

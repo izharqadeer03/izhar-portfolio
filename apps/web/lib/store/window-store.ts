@@ -16,7 +16,7 @@ import { clamp } from '@/lib/utils';
 
 /**
  * The rectangle a window may occupy: the viewport minus whatever chrome the
- * active environment reserves. Its origin is not necessarily (0, 0) — Linux
+ * active environment reserves. Its origin is not necessarily (0, 0) — Ubuntu
  * keeps a dock down the left edge and macOS a menu bar across the top.
  */
 export interface WorkArea {

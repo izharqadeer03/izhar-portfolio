@@ -54,8 +54,15 @@ export function AppleLogo({ size = 16, className }: OSLogoProps) {
   );
 }
 
-/** Tux, reduced to the shapes that still read as Tux at 14px. */
-export function TuxLogo({ size = 16, className }: OSLogoProps) {
+/**
+ * Ubuntu's Circle of Friends: three figures joined in a ring.
+ *
+ * Built from one stroked circle rather than three drawn arcs — `pathLength`
+ * normalises the circumference to 90 units, so the dashes divide it into exact
+ * thirds and the three heads land in the gaps by construction rather than by
+ * hand-fitted path data.
+ */
+export function UbuntuLogo({ size = 16, className }: OSLogoProps) {
   return (
     <svg
       width={size}
@@ -65,24 +72,22 @@ export function TuxLogo({ size = 16, className }: OSLogoProps) {
       aria-hidden="true"
       className={cn('shrink-0', className)}
     >
-      {/* Body and head, one silhouette. */}
-      <path
-        d="M12 1.9c-2.36 0-4.05 1.72-4.05 4.06v2.13c0 .93-.4 1.6-1.03 2.42-1.2 1.55-2.13 3.2-2.65 5.16-.29 1.1-.45 2.1-.9 2.93-.36.66-.1 1.44.6 1.72 1.2.47 2.2.2 2.86-.2.2-.13.45-.06.57.14.7 1.14 2.1 1.85 4.6 1.85s3.9-.71 4.6-1.85c.12-.2.37-.27.57-.14.66.4 1.66.67 2.86.2.7-.28.96-1.06.6-1.72-.45-.83-.61-1.83-.9-2.93-.52-1.96-1.45-3.61-2.65-5.16-.63-.82-1.03-1.49-1.03-2.42V5.96c0-2.34-1.69-4.06-4.05-4.06Z"
-        fill="currentColor"
+      {/* The ring, broken into three arcs. The offset is half a dash, which
+          starts the pattern mid-arc so a gap sits over every head. */}
+      <circle
+        cx="12"
+        cy="12"
+        r="7.2"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        pathLength="90"
+        strokeDasharray="17 13"
+        strokeDashoffset="8.5"
       />
-      {/* Belly — punched out of the silhouette so it reads on any ground. */}
-      <path
-        d="M12 11.1c1.9 0 3.35 1.32 4.06 2.9.62 1.4.9 2.86.9 3.94 0 2.06-2.2 3.36-4.96 3.36s-4.96-1.3-4.96-3.36c0-1.08.28-2.55.9-3.95.71-1.57 2.16-2.89 4.06-2.89Z"
-        fill="var(--color-void)"
-        opacity="0.55"
-      />
-      {/* Eyes and beak. */}
-      <ellipse cx="10.35" cy="6.1" rx="0.95" ry="1.25" fill="var(--color-void)" />
-      <ellipse cx="13.65" cy="6.1" rx="0.95" ry="1.25" fill="var(--color-void)" />
-      <path
-        d="M12 7.05c1.05 0 1.85.5 1.85 1.13 0 .62-.8 1.12-1.85 1.12s-1.85-.5-1.85-1.12c0-.63.8-1.13 1.85-1.13Z"
-        fill="#f0a92e"
-      />
+      {/* The heads, at thirds of the circle. */}
+      <circle cx="4.8" cy="12" r="2.5" fill="currentColor" />
+      <circle cx="15.6" cy="5.77" r="2.5" fill="currentColor" />
+      <circle cx="15.6" cy="18.23" r="2.5" fill="currentColor" />
     </svg>
   );
 }
@@ -90,7 +95,7 @@ export function TuxLogo({ size = 16, className }: OSLogoProps) {
 const LOGOS = {
   windows: WindowsLogo,
   apple: AppleLogo,
-  tux: TuxLogo,
+  ubuntu: UbuntuLogo,
 } as const;
 
 export interface EnvironmentLogoProps extends OSLogoProps {

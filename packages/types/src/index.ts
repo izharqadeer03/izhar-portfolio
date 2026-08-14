@@ -10,6 +10,15 @@ export type {
 
 export type { EnvironmentDefinition, EnvironmentId, EnvironmentLogo } from './environment';
 
+export type {
+  AboutProfile,
+  BuildArea,
+  FocusArea,
+  JourneyStage,
+  ProfileStat,
+  StackGroup,
+} from './profile';
+
 export type { Bounds, Point, ResizeEdge, Size, WindowInstance } from './window';
 
 export type {

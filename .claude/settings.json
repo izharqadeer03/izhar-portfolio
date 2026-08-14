@@ -54,7 +54,12 @@
       "PowerShell(pnpm --filter web exec tsc --noEmit 2>&1)",
       "PowerShell(pnpm --filter web exec tsc --noEmit; \"exit=$LASTEXITCODE\")",
       "PowerShell(gh --version)",
-      "PowerShell(gh auth status)"
+      "PowerShell(gh auth status)",
+      "PowerShell(git config user.name)",
+      "PowerShell(git config user.email)",
+      "Bash(git commit -q -m ' *)",
+      "PowerShell(gh repo create izhar-portfolio --public --source=. --remote=origin --push 2>&1)",
+      "PowerShell(gh repo view izharqadeer03/izhar-portfolio --json name,visibility,defaultBranchRef,url)"
     ]
   }
 }
