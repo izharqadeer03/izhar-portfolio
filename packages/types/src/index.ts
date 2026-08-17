@@ -6,6 +6,8 @@ export type {
   ApplicationId,
   ApplicationSize,
   ApplicationStatus,
+  GlobalSearchResult,
+  SearchResultCategory,
 } from './application';
 
 export type { EnvironmentDefinition, EnvironmentId, EnvironmentLogo } from './environment';

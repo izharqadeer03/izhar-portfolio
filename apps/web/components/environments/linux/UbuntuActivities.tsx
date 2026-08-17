@@ -139,13 +139,66 @@ function ActivitiesSurface({ onClose }: { onClose: () => void }) {
           </section>
         ) : null}
 
-        {/* Applications. */}
+        {/* Applications & Global Portfolio Results */}
         <section className="mt-10 pb-6">
           <h2 className="mb-4 font-mono text-[10px] font-medium tracking-[0.2em] text-faint uppercase">
-            {launcher.query ? 'Results' : 'Applications'}
+            {launcher.query.trim() ? 'Portfolio Search Results' : 'Applications'}
           </h2>
 
-          {launcher.results.length === 0 ? (
+          {launcher.query.trim() ? (
+            launcher.globalResults.length === 0 ? (
+              <p className="py-10 text-center text-[13px] text-muted">
+                No portfolio items match “{launcher.query}”.
+              </p>
+            ) : (
+              <ul
+                id="activities-results"
+                role="listbox"
+                aria-label="Portfolio Search Results"
+                className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto os-scroll px-1"
+              >
+                {launcher.globalResults.map((result, index) => (
+                  <li key={result.id} role="none">
+                    <button
+                      type="button"
+                      id={`activities-item-${result.id}`}
+                      role="option"
+                      aria-selected={index === launcher.highlight}
+                      tabIndex={-1}
+                      onClick={() => launcher.launchGlobal(result)}
+                      onPointerEnter={() => launcher.setHighlight(index)}
+                      className={cn(
+                        'flex w-full items-center gap-3.5 rounded-xl border px-4 py-3 text-left',
+                        'transition-colors duration-150',
+                        index === launcher.highlight
+                          ? 'border-orange-500/60 bg-orange-500/15'
+                          : 'border-white/10 bg-black/25 hover:bg-white/[0.06]',
+                      )}
+                    >
+                      <div className="shrink-0">
+                        <AppTile
+                          icon={result.icon ?? 'search'}
+                          accent={(result.accent as any) ?? 'amber'}
+                          size={36}
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="truncate text-[13px] font-semibold text-fg">
+                            {result.title}
+                          </span>
+                          <span className="rounded bg-orange-500/20 px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-wider text-orange-300 shrink-0 border border-orange-500/30">
+                            {result.categoryLabel}
+                          </span>
+                        </div>
+                        <p className="truncate text-[11.5px] text-muted">{result.subtitle}</p>
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )
+          ) : launcher.results.length === 0 ? (
             <p className="py-10 text-center text-[13px] text-muted">
               No applications match “{launcher.query}”.
             </p>
@@ -193,7 +246,9 @@ function ActivitiesSurface({ onClose }: { onClose: () => void }) {
         <p className="flex items-center justify-center gap-2 pb-4 text-[11.5px] text-faint">
           <CornerDownLeft size={12} strokeWidth={1.8} aria-hidden="true" />
           <span>
-            {launcher.active?.description ?? 'Press Enter to open the highlighted result.'}
+            {launcher.query.trim()
+              ? launcher.activeGlobal?.subtitle ?? 'Press Enter to open result'
+              : launcher.active?.description ?? 'Press Enter to open the highlighted result.'}
           </span>
         </p>
       </motion.div>

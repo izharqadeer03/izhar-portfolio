@@ -107,7 +107,61 @@ function StartPanel({ onClose, triggerRef }: Omit<WindowsStartMenuProps, 'isOpen
           <span className="font-mono text-[10px] text-faint">{launcher.results.length}</span>
         </div>
 
-        {launcher.results.length === 0 ? (
+        {launcher.query.trim() ? (
+          /* Global Search Results List */
+          launcher.globalResults.length === 0 ? (
+            <p className="py-10 text-center text-[12.5px] text-muted">
+              No portfolio items match “{launcher.query}”.
+            </p>
+          ) : (
+            <ul
+              id="start-results"
+              role="listbox"
+              aria-label="Portfolio Search Results"
+              className="flex flex-col gap-1"
+            >
+              {launcher.globalResults.map((result, index) => (
+                <li key={result.id} role="none">
+                  <button
+                    type="button"
+                    id={`start-item-${result.id}`}
+                    role="option"
+                    aria-selected={index === launcher.highlight}
+                    tabIndex={-1}
+                    onClick={() => launcher.launchGlobal(result)}
+                    onPointerEnter={() => launcher.setHighlight(index)}
+                    className={cn(
+                      'flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left',
+                      'transition-colors duration-150 ease-env',
+                      index === launcher.highlight
+                        ? 'border-line-strong bg-white/[0.08]'
+                        : 'border-transparent hover:bg-white/[0.045]',
+                    )}
+                  >
+                    <div className="shrink-0">
+                      <AppTile
+                        icon={result.icon ?? 'search'}
+                        accent={(result.accent as any) ?? 'cyan'}
+                        size={32}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-[12.5px] font-semibold text-fg">
+                          {result.title}
+                        </span>
+                        <span className="rounded bg-white/8 px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-wider text-accent shrink-0">
+                          {result.categoryLabel}
+                        </span>
+                      </div>
+                      <p className="truncate text-[11px] text-muted">{result.subtitle}</p>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )
+        ) : launcher.results.length === 0 ? (
           <p className="py-10 text-center text-[12.5px] text-muted">
             No applications match “{launcher.query}”.
           </p>
@@ -153,7 +207,9 @@ function StartPanel({ onClose, triggerRef }: Omit<WindowsStartMenuProps, 'isOpen
 
         {/* The highlighted application explains itself here, so the grid stays clean. */}
         <p className="truncate pt-3 text-[11.5px] text-muted">
-          {launcher.active?.description ?? SYSTEM_PROFILE.tagline}
+          {launcher.query.trim()
+            ? launcher.activeGlobal?.subtitle ?? 'Press Enter to open'
+            : launcher.active?.description ?? SYSTEM_PROFILE.tagline}
         </p>
       </div>
 

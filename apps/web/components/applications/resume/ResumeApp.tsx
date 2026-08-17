@@ -111,7 +111,7 @@ export function ResumeApp(_props: ApplicationViewProps) {
         <div
           ref={printRef}
           style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
-          className="w-full max-w-[780px] rounded-xl border border-line bg-[#0e1217] p-6 sm:p-10 shadow-2xl text-fg space-y-7 transition-transform duration-150"
+          className="printable-resume w-full max-w-[780px] rounded-xl border border-line bg-[#0e1217] p-6 sm:p-10 shadow-2xl text-fg space-y-7 transition-transform duration-150"
         >
           {/* Header */}
           <header className="border-b border-line pb-6 space-y-3">

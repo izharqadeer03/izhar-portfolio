@@ -1,4 +1,6 @@
-import type { ApplicationDefinition, ApplicationId } from '@izhar-os/types';
+import type { ApplicationDefinition, ApplicationId, GlobalSearchResult } from '@izhar-os/types';
+import { EXPERIENCES, RESUME_DATA, SKILLS } from './profile';
+import { PROJECTS } from './projects';
 
 /**
  * The application manifest — the single source of truth for what exists in
@@ -72,7 +74,7 @@ export const APPLICATIONS: ApplicationDefinition[] = [
     status: 'available',
     accent: 'emerald',
     icon: 'experience',
-    keywords: ['career', 'jobs', 'history', 'roles', 'timeline', 'work', 'companies'],
+    keywords: ['career', 'jobs', 'history', 'roles', 'timeline', 'work', 'companies', 'mobiloitte'],
     defaultSize: { width: 880, height: 640 },
     minSize: { width: 420, height: 360 },
     showOnDesktop: true,
@@ -117,7 +119,7 @@ export const APPLICATIONS: ApplicationDefinition[] = [
     status: 'available',
     accent: 'slate',
     icon: 'resume',
-    keywords: ['cv', 'download', 'pdf', 'document', 'resume', 'print', 'bio'],
+    keywords: ['cv', 'download', 'pdf', 'document', 'resume', 'print', 'bio', 'education', 'certifications'],
     defaultSize: { width: 820, height: 680 },
     minSize: { width: 420, height: 380 },
     showOnDesktop: true,
@@ -238,3 +240,193 @@ export function searchApplications(query: string): ApplicationDefinition[] {
   scored.sort((a, b) => b.score - a.score);
   return scored.map((entry) => entry.application);
 }
+
+/**
+ * Global portfolio search across applications, projects, skills, experience,
+ * education, and resume items.
+ */
+export function searchGlobalPortfolio(query: string): GlobalSearchResult[] {
+  const term = query.trim().toLowerCase();
+  if (!term) {
+    return APPLICATIONS.map((app) => ({
+      id: `app-${app.id}`,
+      title: app.title,
+      subtitle: app.description,
+      category: 'application',
+      categoryLabel: 'App',
+      applicationId: app.id,
+      accent: app.accent,
+      icon: app.icon,
+    }));
+  }
+
+  const results: { item: GlobalSearchResult; score: number }[] = [];
+
+  // 1. Applications
+  for (const app of APPLICATIONS) {
+    const title = app.title.toLowerCase();
+    const short = app.shortTitle.toLowerCase();
+    let score = -1;
+    if (title === term || short === term) score = 100;
+    else if (title.startsWith(term) || short.startsWith(term)) score = 85;
+    else if (title.includes(term)) score = 70;
+    else if (app.keywords.some((k) => k.startsWith(term))) score = 55;
+    else if (app.keywords.some((k) => k.includes(term))) score = 40;
+    else if (app.description.toLowerCase().includes(term)) score = 25;
+
+    if (score >= 0) {
+      results.push({
+        score,
+        item: {
+          id: `app-${app.id}`,
+          title: app.title,
+          subtitle: app.description,
+          category: 'application',
+          categoryLabel: 'App',
+          applicationId: app.id,
+          accent: app.accent,
+          icon: app.icon,
+        },
+      });
+    }
+  }
+
+  // 2. Projects
+  for (const proj of PROJECTS) {
+    const name = proj.name.toLowerCase();
+    const cat = proj.categoryName.toLowerCase();
+    const techs = proj.technologies.map((t) => t.toLowerCase());
+    let score = -1;
+    if (name === term) score = 95;
+    else if (name.startsWith(term)) score = 82;
+    else if (name.includes(term)) score = 68;
+    else if (techs.some((t) => t === term)) score = 76;
+    else if (techs.some((t) => t.includes(term))) score = 52;
+    else if (cat.includes(term) || proj.shortDescription.toLowerCase().includes(term)) score = 35;
+
+    if (score >= 0) {
+      results.push({
+        score,
+        item: {
+          id: `proj-${proj.id}`,
+          title: proj.name,
+          subtitle: `${proj.role} · ${proj.technologies.slice(0, 4).join(', ')}`,
+          category: 'project',
+          categoryLabel: 'Project',
+          applicationId: 'projects',
+          targetId: proj.id,
+          accent: proj.accent,
+          icon: proj.icon,
+        },
+      });
+    }
+  }
+
+  // 3. Skills
+  for (const skill of SKILLS) {
+    const name = skill.name.toLowerCase();
+    const tags = (skill.tags ?? []).map((t) => t.toLowerCase());
+    let score = -1;
+    if (name === term) score = 90;
+    else if (name.startsWith(term)) score = 78;
+    else if (name.includes(term)) score = 62;
+    else if (tags.some((t) => t === term)) score = 66;
+    else if (tags.some((t) => t.includes(term))) score = 48;
+    else if (
+      skill.description.toLowerCase().includes(term) ||
+      skill.architecturalRole?.toLowerCase().includes(term)
+    ) {
+      score = 30;
+    }
+
+    if (score >= 0) {
+      results.push({
+        score,
+        item: {
+          id: `skill-${skill.id}`,
+          title: skill.name,
+          subtitle: `${skill.level} · ${skill.years} · ${skill.architecturalRole ?? skill.category}`,
+          category: 'skill',
+          categoryLabel: 'Skill',
+          applicationId: 'skills',
+          targetId: skill.id,
+          accent: 'amber',
+          icon: 'skills',
+        },
+      });
+    }
+  }
+
+  // 4. Experience
+  for (const exp of EXPERIENCES) {
+    const company = exp.company.toLowerCase();
+    const role = exp.role.toLowerCase();
+    let score = -1;
+    if (company.includes(term) || role.includes(term)) score = 72;
+    else if (exp.focusAreas?.some((f) => f.toLowerCase().includes(term))) score = 46;
+    else if (exp.technologies.some((t) => t.toLowerCase().includes(term))) score = 42;
+
+    if (score >= 0) {
+      results.push({
+        score,
+        item: {
+          id: `exp-${exp.id}`,
+          title: `${exp.role} · ${exp.company}`,
+          subtitle: `${exp.period} · ${exp.location}`,
+          category: 'experience',
+          categoryLabel: 'Role',
+          applicationId: 'experience',
+          targetId: exp.id,
+          accent: 'emerald',
+          icon: 'experience',
+        },
+      });
+    }
+  }
+
+  // 5. Education & Resume
+  for (const edu of RESUME_DATA.education) {
+    const inst = edu.institution.toLowerCase();
+    const deg = edu.degree.toLowerCase();
+    if (
+      inst.includes(term) ||
+      deg.includes(term) ||
+      term.includes('education') ||
+      term.includes('college') ||
+      term.includes('degree') ||
+      term.includes('b.tech') ||
+      term.includes('abes') ||
+      term.includes('cgpa')
+    ) {
+      results.push({
+        score: 66,
+        item: {
+          id: 'edu-btech',
+          title: edu.degree,
+          subtitle: `${edu.institution} · 8.5 CGPA (${edu.period})`,
+          category: 'education',
+          categoryLabel: 'Education',
+          applicationId: 'resume',
+          accent: 'slate',
+          icon: 'resume',
+        },
+      });
+    }
+  }
+
+  // Sort by score descending
+  results.sort((a, b) => b.score - a.score);
+
+  // Return unique items
+  const seen = new Set<string>();
+  const unique: GlobalSearchResult[] = [];
+  for (const { item } of results) {
+    if (!seen.has(item.id)) {
+      seen.add(item.id);
+      unique.push(item);
+    }
+  }
+
+  return unique;
+}
+

@@ -83,3 +83,24 @@ export interface ApplicationDefinition {
   /** Target milestone label, e.g. "Phase 2". */
   plannedRelease?: string;
 }
+
+export type SearchResultCategory =
+  | 'application'
+  | 'project'
+  | 'skill'
+  | 'experience'
+  | 'resume'
+  | 'education'
+  | 'about';
+
+export interface GlobalSearchResult {
+  id: string;
+  title: string;
+  subtitle: string;
+  category: SearchResultCategory;
+  categoryLabel: string;
+  applicationId: ApplicationId;
+  targetId?: string;
+  accent?: string;
+  icon?: string;
+}

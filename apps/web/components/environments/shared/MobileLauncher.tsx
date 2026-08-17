@@ -119,33 +119,64 @@ function LauncherSheet({ onClose, triggerRef }: Omit<MobileLauncherProps, 'isOpe
         </div>
 
         <div className="os-scroll min-h-0 flex-1 overflow-y-auto px-4">
-          <ul className="grid grid-cols-3 gap-1" aria-label="Applications">
-            {launcher.results.map((application) => (
-              <li key={application.id}>
-                <button
-                  type="button"
-                  onClick={() => launcher.launch(application)}
-                  className="flex w-full flex-col items-center gap-2 rounded-xl px-2 py-3 transition-colors hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-                >
-                  <AppTile
-                    icon={application.icon}
-                    accent={application.accent}
-                    size={44}
-                    muted={application.status === 'coming-soon'}
-                  />
-                  <span className="line-clamp-1 max-w-full text-[11.5px] text-fg/90">
-                    {application.shortTitle}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          {launcher.results.length === 0 ? (
-            <p className="py-10 text-center text-[12.5px] text-muted">
-              No applications match “{launcher.query}”.
-            </p>
-          ) : null}
+          {launcher.query.trim() ? (
+            launcher.globalResults.length === 0 ? (
+              <p className="py-8 text-center text-[12.5px] text-muted">
+                No items match “{launcher.query}”.
+              </p>
+            ) : (
+              <ul className="flex flex-col gap-1.5 pb-3" aria-label="Search Results">
+                {launcher.globalResults.map((result) => (
+                  <li key={result.id}>
+                    <button
+                      type="button"
+                      onClick={() => launcher.launchGlobal(result)}
+                      className="flex w-full items-center gap-3 rounded-xl border border-line/60 bg-white/[0.03] p-2.5 text-left transition-colors active:bg-white/[0.08]"
+                    >
+                      <AppTile
+                        icon={result.icon ?? 'search'}
+                        accent={(result.accent as any) ?? 'cyan'}
+                        size={32}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="truncate text-[12px] font-semibold text-fg">
+                            {result.title}
+                          </span>
+                          <span className="rounded bg-white/10 px-1.5 py-0.2 font-mono text-[9px] uppercase tracking-wider text-accent shrink-0">
+                            {result.categoryLabel}
+                          </span>
+                        </div>
+                        <p className="truncate text-[11px] text-muted">{result.subtitle}</p>
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )
+          ) : (
+            <ul className="grid grid-cols-3 gap-1" aria-label="Applications">
+              {launcher.results.map((application) => (
+                <li key={application.id}>
+                  <button
+                    type="button"
+                    onClick={() => launcher.launch(application)}
+                    className="flex w-full flex-col items-center gap-2 rounded-xl px-2 py-3 transition-colors hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  >
+                    <AppTile
+                      icon={application.icon}
+                      accent={application.accent}
+                      size={44}
+                      muted={application.status === 'coming-soon'}
+                    />
+                    <span className="line-clamp-1 max-w-full text-[11.5px] text-fg/90">
+                      {application.shortTitle}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Workspace choice. */}

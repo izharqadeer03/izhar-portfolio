@@ -97,7 +97,60 @@ function LaunchpadSurface({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {launcher.results.length === 0 ? (
+        {launcher.query.trim() ? (
+          launcher.globalResults.length === 0 ? (
+            <p className="mt-16 text-center text-[13px] text-muted">
+              No portfolio items match “{launcher.query}”.
+            </p>
+          ) : (
+            <ul
+              id="launchpad-results"
+              role="listbox"
+              aria-label="Portfolio Search Results"
+              className="mt-8 flex flex-col gap-1.5 max-h-[55vh] overflow-y-auto os-scroll px-2"
+            >
+              {launcher.globalResults.map((result, index) => (
+                <li key={result.id} role="none">
+                  <button
+                    type="button"
+                    id={`launchpad-item-${result.id}`}
+                    role="option"
+                    aria-selected={index === launcher.highlight}
+                    tabIndex={-1}
+                    onClick={() => launcher.launchGlobal(result)}
+                    onPointerEnter={() => launcher.setHighlight(index)}
+                    className={cn(
+                      'flex w-full items-center gap-3.5 rounded-xl border px-4 py-3 text-left',
+                      'transition-colors duration-150 ease-env backdrop-blur-md',
+                      index === launcher.highlight
+                        ? 'border-line-strong bg-white/[0.12] shadow-lg'
+                        : 'border-line/40 bg-white/[0.04] hover:bg-white/[0.08]',
+                    )}
+                  >
+                    <div className="shrink-0">
+                      <AppTile
+                        icon={result.icon ?? 'search'}
+                        accent={(result.accent as any) ?? 'cyan'}
+                        size={36}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-[13px] font-semibold text-fg">
+                          {result.title}
+                        </span>
+                        <span className="rounded bg-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent shrink-0">
+                          {result.categoryLabel}
+                        </span>
+                      </div>
+                      <p className="truncate text-[11.5px] text-muted">{result.subtitle}</p>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )
+        ) : launcher.results.length === 0 ? (
           <p className="mt-16 text-center text-[13px] text-muted">
             No applications match “{launcher.query}”.
           </p>
@@ -144,7 +197,9 @@ function LaunchpadSurface({ onClose }: { onClose: () => void }) {
         )}
 
         <p className="mt-10 text-center text-[12px] text-muted">
-          {launcher.active?.description ?? SYSTEM_PROFILE.statement}
+          {launcher.query.trim()
+            ? launcher.activeGlobal?.subtitle ?? 'Press Enter to open'
+            : launcher.active?.description ?? SYSTEM_PROFILE.statement}
         </p>
       </motion.div>
     </motion.div>

@@ -1,7 +1,7 @@
 'use client';
 
-import { searchApplications } from '@izhar-os/config';
-import type { ApplicationDefinition } from '@izhar-os/types';
+import { searchApplications, searchGlobalPortfolio } from '@izhar-os/config';
+import type { ApplicationDefinition, GlobalSearchResult } from '@izhar-os/types';
 import { useCallback, useMemo, useState } from 'react';
 
 import { useWindowStore } from '@/lib/store/window-store';
@@ -10,13 +10,16 @@ export interface LauncherSearch {
   query: string;
   setQuery: (value: string) => void;
   results: ApplicationDefinition[];
+  globalResults: GlobalSearchResult[];
   /** Index of the visually highlighted result. */
   highlight: number;
   setHighlight: (index: number) => void;
   /** The highlighted application, if there is one. */
   active: ApplicationDefinition | undefined;
+  activeGlobal: GlobalSearchResult | undefined;
   /** Opens an application and closes the launcher. */
   launch: (application: ApplicationDefinition) => void;
+  launchGlobal: (item: GlobalSearchResult) => void;
   /** Arrow / Home / End / Enter handling. Attach to the search field. */
   handleKeyDown: (event: React.KeyboardEvent) => void;
 }
@@ -43,7 +46,10 @@ export function useLauncherSearch({ columns, onLaunch }: LauncherOptions): Launc
   const [highlight, setHighlight] = useState(0);
 
   const results = useMemo(() => searchApplications(query), [query]);
+  const globalResults = useMemo(() => searchGlobalPortfolio(query), [query]);
+
   const active = results[highlight];
+  const activeGlobal = globalResults[highlight];
 
   const setQuery = useCallback((value: string) => {
     setQueryValue(value);
@@ -59,13 +65,22 @@ export function useLauncherSearch({ columns, onLaunch }: LauncherOptions): Launc
     [onLaunch, openWindow],
   );
 
+  const launchGlobal = useCallback(
+    (item: GlobalSearchResult) => {
+      openWindow(item.applicationId);
+      onLaunch();
+    },
+    [onLaunch, openWindow],
+  );
+
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
-      if (results.length === 0) return;
+      const activeLength = query.trim() ? globalResults.length : results.length;
+      if (activeLength === 0) return;
 
       const move = (delta: number) => {
         event.preventDefault();
-        setHighlight((index) => Math.min(results.length - 1, Math.max(0, index + delta)));
+        setHighlight((index) => Math.min(activeLength - 1, Math.max(0, index + delta)));
       };
 
       switch (event.key) {
@@ -76,10 +91,10 @@ export function useLauncherSearch({ columns, onLaunch }: LauncherOptions): Launc
           move(-1);
           break;
         case 'ArrowDown':
-          move(columns);
+          move(query.trim() ? 1 : columns);
           break;
         case 'ArrowUp':
-          move(-columns);
+          move(query.trim() ? -1 : -columns);
           break;
         case 'Home':
           event.preventDefault();
@@ -87,18 +102,35 @@ export function useLauncherSearch({ columns, onLaunch }: LauncherOptions): Launc
           break;
         case 'End':
           event.preventDefault();
-          setHighlight(results.length - 1);
+          setHighlight(activeLength - 1);
           break;
         case 'Enter':
           event.preventDefault();
-          if (active) launch(active);
+          if (query.trim() && activeGlobal) {
+            launchGlobal(activeGlobal);
+          } else if (active) {
+            launch(active);
+          }
           break;
         default:
           break;
       }
     },
-    [active, columns, launch, results.length],
+    [active, activeGlobal, columns, globalResults.length, launch, launchGlobal, query, results.length],
   );
 
-  return { query, setQuery, results, highlight, setHighlight, active, launch, handleKeyDown };
+  return {
+    query,
+    setQuery,
+    results,
+    globalResults,
+    highlight,
+    setHighlight,
+    active,
+    activeGlobal,
+    launch,
+    launchGlobal,
+    handleKeyDown,
+  };
 }
+

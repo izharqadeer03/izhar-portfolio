@@ -16,15 +16,15 @@ export const OS_META: OperatingSystemMeta = {
 export const SYSTEM_PROFILE: SystemProfile = {
   name: 'Izhar Qadeer',
   wordmark: 'IZHAR',
-  role: 'Full Stack Developer',
+  role: 'Software Engineer / Backend Engineer',
   // Ordered by depth, not by breadth: the title says what the work spans, the
   // disciplines say where the expertise is — and backend leads.
-  disciplines: ['Backend', 'Full Stack', 'AI / LLM'],
+  disciplines: ['Backend & Go/Node', 'Distributed Systems', 'AI & LLM Integration'],
   location: 'New Delhi, India',
   tagline: 'Welcome to my workspace.',
   statement:
-    'Full Stack Developer with around 3 years of experience building scalable web applications using React.js, Next.js, Node.js, and Golang, integrating AI-powered features and real-time systems.',
-  experience: '3+ Years',
+    'Software Engineer / Backend Engineer with approximately 3 years of experience building scalable systems using Golang, Node.js, PostgreSQL, Redis, and modern full-stack architectures, integrating AI/LLM systems and real-time duplex pipelines.',
+  experience: '3 Years (2023 — Present)',
   status: {
     state: 'available',
     label: 'Available',

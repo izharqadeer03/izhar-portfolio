@@ -43,6 +43,8 @@ export function ContactApp(_props: ApplicationViewProps) {
     [addToast],
   );
 
+  const [preparedDraft, setPreparedDraft] = useState<string | null>(null);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !message.trim()) {
@@ -52,16 +54,22 @@ export function ContactApp(_props: ApplicationViewProps) {
 
     setIsSending(true);
 
-    // Simulate realistic asynchronous network submission
+    const topicObj = CONTACT_CONFIG.topics.find((t) => t.id === selectedTopic);
+    const subject = encodeURIComponent(`[${topicObj?.label ?? 'Portfolio Inquiry'}] Message from ${name}`);
+    const body = encodeURIComponent(
+      `Hi Izhar,\n\nName: ${name}\nEmail: ${email}\nInquiry Topic: ${topicObj?.label ?? selectedTopic}\n\nMessage:\n${message}\n\n---\nSent via IZHAR OS Portfolio`,
+    );
+    const mailtoUrl = `mailto:${CONTACT_CONFIG.email}?subject=${subject}&body=${body}`;
+
     setTimeout(() => {
       setIsSending(false);
       setIsSent(true);
-      addToast('Message sent successfully! Izhar will respond shortly.', 'success');
-      setName('');
-      setEmail('');
-      setMessage('');
-    }, 1200);
+      setPreparedDraft(mailtoUrl);
+      addToast('Opening email client with prepared message...', 'success');
+      window.location.href = mailtoUrl;
+    }, 600);
   };
+
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-surface/15 select-none @container">
@@ -250,14 +258,34 @@ export function ContactApp(_props: ApplicationViewProps) {
             </div>
 
             {/* Submission feedback & buttons */}
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
               {isSent ? (
-                <div className="flex items-center gap-1.5 text-[12px] text-emerald-400 font-medium">
-                  <CheckCircle2 size={14} /> Message sent successfully!
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-1.5 text-[12px] text-emerald-400 font-medium">
+                    <CheckCircle2 size={14} /> Ready for dispatch to {CONTACT_CONFIG.email}
+                  </div>
+                  {preparedDraft ? (
+                    <a
+                      href={preparedDraft}
+                      className="inline-flex items-center gap-1 rounded-md border border-line bg-void/50 px-2 py-1 text-[11.5px] text-fg hover:bg-white/10"
+                    >
+                      <Mail size={12} /> Open Mail Client
+                    </a>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSent(false);
+                      setPreparedDraft(null);
+                    }}
+                    className="text-[11.5px] text-muted hover:text-fg underline ml-1"
+                  >
+                    Edit message
+                  </button>
                 </div>
               ) : (
                 <span className="text-[11.5px] text-faint">
-                  Average response SLA: within 12–24 hours
+                  Direct dispatch to {CONTACT_CONFIG.email}
                 </span>
               )}
 
@@ -271,12 +299,12 @@ export function ContactApp(_props: ApplicationViewProps) {
                 {isSending ? (
                   <>
                     <Loader2 size={13} className="animate-spin" />
-                    <span>Sending...</span>
+                    <span>Preparing...</span>
                   </>
                 ) : (
                   <>
                     <Send size={13} />
-                    <span>Send Message</span>
+                    <span>{isSent ? 'Resend' : 'Send Message'}</span>
                   </>
                 )}
               </OSButton>

@@ -19,6 +19,7 @@ import { useChromeInsets, useEnvironment, useEnvironmentDefinition } from '@/hoo
 import { useHasFinePointer } from '@/hooks/useSystemPreferences';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useSystemStore } from '@/lib/store/system-store';
+import { useToastStore } from '@/lib/store/toast-store';
 
 /**
  * The desktop.
@@ -105,6 +106,23 @@ export function Desktop() {
 
   // Phase 4: global keyboard shortcuts for window management and desktop control.
   useKeyboardShortcuts({ isLauncherOpen: launcherOpen, onCloseLauncher: closeLauncher });
+
+  // One-time session welcome notification.
+  const addToast = useToastStore((state) => state.addToast);
+  useEffect(() => {
+    try {
+      const welcomed = sessionStorage.getItem('izhar_os_welcomed');
+      if (!welcomed) {
+        sessionStorage.setItem('izhar_os_welcomed', 'true');
+        const timer = setTimeout(() => {
+          addToast('Welcome to IZHAR OS · Personal Developer Workspace', 'info', 4500);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    } catch {
+      // Ignore if storage is restricted
+    }
+  }, [addToast]);
 
   return (
     <div

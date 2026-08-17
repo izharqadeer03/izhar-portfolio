@@ -478,3 +478,64 @@
     transform: scale(1);
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Print Stylesheet for Resume and Recruiter Export
+ * ------------------------------------------------------------------------- */
+@media print {
+  @page {
+    margin: 1.2cm;
+    size: A4 portrait;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  /* Hide OS system chrome, taskbar, dock, desktop controls */
+  .fluent-acrylic,
+  .mac-vibrancy,
+  .os-tip,
+  button,
+  .os-scroll::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .printable-resume {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    transform: none !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .printable-resume * {
+    color: #1f2937 !important;
+    border-color: #e5e7eb !important;
+    text-shadow: none !important;
+  }
+
+  .printable-resume h1,
+  .printable-resume h2,
+  .printable-resume h3,
+  .printable-resume strong {
+    color: #111827 !important;
+  }
+
+  .printable-resume .text-emerald-400,
+  .printable-resume .text-emerald-300 {
+    color: #047857 !important;
+  }
+
+  .printable-resume .text-muted,
+  .printable-resume .text-faint {
+    color: #4b5563 !important;
+  }
+}
+

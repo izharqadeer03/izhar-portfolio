@@ -4,6 +4,7 @@ export {
   getApplication,
   PORTFOLIO_ENTRIES,
   searchApplications,
+  searchGlobalPortfolio,
 } from './applications';
 
 export {
