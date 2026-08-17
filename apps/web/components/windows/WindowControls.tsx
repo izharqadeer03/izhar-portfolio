@@ -8,6 +8,7 @@ import type { WindowControlStyle } from '@/lib/environment';
 interface WindowControlsProps {
   title: string;
   style: WindowControlStyle;
+  isFocused: boolean;
   isMaximized: boolean;
   canMaximize: boolean;
   onMinimize: () => void;
@@ -27,6 +28,7 @@ interface WindowControlsProps {
 export function WindowControls({
   title,
   style,
+  isFocused,
   isMaximized,
   canMaximize,
   onMinimize,
@@ -37,6 +39,7 @@ export function WindowControls({
     return (
       <TrafficLights
         title={title}
+        isFocused={isFocused}
         isMaximized={isMaximized}
         canMaximize={canMaximize}
         onMinimize={onMinimize}
@@ -49,9 +52,10 @@ export function WindowControls({
   const compact = style === 'compact';
 
   const control = cn(
-    'grid place-items-center transition-colors duration-150 ease-env',
+    'grid place-items-center transition-[color,background-color,transform] duration-150 ease-env',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
     'focus-visible:ring-offset-1 focus-visible:ring-offset-surface',
+    'hover:scale-105 active:scale-95',
     compact
       ? 'size-6 rounded-[3px] text-muted hover:bg-white/10 hover:text-fg'
       : 'size-7 rounded-md text-faint hover:bg-white/8 hover:text-fg',
@@ -145,6 +149,7 @@ const LIGHT_GLYPH =
 
 function TrafficLights({
   title,
+  isFocused,
   isMaximized,
   canMaximize,
   onMinimize,
@@ -155,7 +160,7 @@ function TrafficLights({
     <div className="group/lights flex items-center gap-2">
       <button
         type="button"
-        className={cn(LIGHT, 'bg-[#ff5f57]')}
+        className={cn(LIGHT, isFocused ? 'bg-[#ff5f57]' : 'bg-white/15')}
         aria-label={`Close ${title}`}
         onClick={onClose}
       >
@@ -166,7 +171,7 @@ function TrafficLights({
 
       <button
         type="button"
-        className={cn(LIGHT, 'bg-[#febc2e]')}
+        className={cn(LIGHT, isFocused ? 'bg-[#febc2e]' : 'bg-white/15')}
         aria-label={`Minimize ${title}`}
         onClick={onMinimize}
       >
@@ -177,7 +182,12 @@ function TrafficLights({
 
       <button
         type="button"
-        className={cn(LIGHT, canMaximize ? 'bg-[#28c840]' : 'bg-white/15')}
+        className={cn(
+          LIGHT,
+          canMaximize
+            ? isFocused ? 'bg-[#28c840]' : 'bg-white/15'
+            : 'bg-white/15',
+        )}
         aria-label={`${isMaximized ? 'Restore' : 'Maximize'} ${title}`}
         onClick={onToggleMaximize}
         disabled={!canMaximize}

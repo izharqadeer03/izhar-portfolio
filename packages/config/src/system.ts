@@ -8,8 +8,8 @@ import type { OperatingSystemMeta, PlatformEntry, SystemProfile } from '@izhar-o
 export const OS_META: OperatingSystemMeta = {
   name: 'IZHAR OS',
   shortName: 'IZ',
-  version: '1.6.0',
-  channel: 'Phase 2 — Applications',
+  version: '2.0.0',
+  channel: 'Phase 4 — Production',
   description: 'Personal Developer Workspace',
 };
 
@@ -20,20 +20,20 @@ export const SYSTEM_PROFILE: SystemProfile = {
   // Ordered by depth, not by breadth: the title says what the work spans, the
   // disciplines say where the expertise is — and backend leads.
   disciplines: ['Backend', 'Full Stack', 'AI / LLM'],
-  location: 'India',
+  location: 'New Delhi, India',
   tagline: 'Welcome to my workspace.',
   statement:
-    'Building scalable APIs, realtime services and AI-powered systems in Golang and Node.js — and the Next.js and React interfaces on top of them.',
+    'Full Stack Developer with around 3 years of experience building scalable web applications using React.js, Next.js, Node.js, and Golang, integrating AI-powered features and real-time systems.',
   experience: '3+ Years',
   status: {
     state: 'available',
     label: 'Available',
-    detail: 'Open to new projects and engineering roles.',
+    detail: 'Open to AI Development, Full Stack Freelancing & Engineering Roles.',
   },
   links: [
-    { id: 'github', label: 'GitHub', href: 'https://github.com', icon: 'github' },
-    { id: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com', icon: 'linkedin' },
-    { id: 'email', label: 'Email', href: 'mailto:hello@example.com', icon: 'mail' },
+    { id: 'github', label: 'GitHub', href: 'https://github.com/izharqadeer03', icon: 'github' },
+    { id: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com/in/izhar-qadeer-840b3919a', icon: 'linkedin' },
+    { id: 'email', label: 'Email', href: 'mailto:izharqadeer03@gmail.com', icon: 'mail' },
   ],
 };
 
@@ -50,6 +50,7 @@ export const PLATFORM_ENTRIES: PlatformEntry[] = [
 export const ROADMAP: { label: string; detail: string; done: boolean }[] = [
   { label: 'Phase 1', detail: 'Workspace, window manager, environment', done: true },
   { label: 'Phase 1.5', detail: 'Windows, macOS and Ubuntu environments', done: true },
-  { label: 'Phase 2', detail: 'Portfolio applications and content', done: false },
-  { label: 'Phase 3', detail: 'AI Lab and assistant services', done: false },
+  { label: 'Phase 2', detail: 'Portfolio applications and content', done: true },
+  { label: 'Phase 3', detail: 'Projects explorer and case studies', done: true },
+  { label: 'Phase 4', detail: 'Polish, interactions and production readiness', done: true },
 ];

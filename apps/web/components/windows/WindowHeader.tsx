@@ -76,6 +76,7 @@ export function WindowHeader({
       <WindowControls
         title={title}
         style={chrome.controls}
+        isFocused={isFocused}
         isMaximized={isMaximized}
         canMaximize
         onMinimize={onMinimize}

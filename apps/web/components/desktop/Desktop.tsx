@@ -13,9 +13,11 @@ import { DesktopIcons } from '@/components/desktop/DesktopIcons';
 import { DesktopIdentity } from '@/components/desktop/DesktopIdentity';
 import { ProfileWidget } from '@/components/desktop/ProfileWidget';
 import { CursorAccent } from '@/components/system/CursorAccent';
+import { ToastContainer } from '@/components/system/ToastContainer';
 import { WindowManager } from '@/components/windows/WindowManager';
 import { useChromeInsets, useEnvironment, useEnvironmentDefinition } from '@/hooks/useEnvironment';
 import { useHasFinePointer } from '@/hooks/useSystemPreferences';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useSystemStore } from '@/lib/store/system-store';
 
 /**
@@ -101,6 +103,9 @@ export function Desktop() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleLauncher]);
 
+  // Phase 4: global keyboard shortcuts for window management and desktop control.
+  useKeyboardShortcuts({ isLauncherOpen: launcherOpen, onCloseLauncher: closeLauncher });
+
   return (
     <div
       className="relative h-dvh w-full overflow-hidden bg-void"
@@ -147,6 +152,8 @@ export function Desktop() {
       />
 
       <DesktopContextMenu anchor={contextAnchor} onClose={closeContextMenu} />
+
+      <ToastContainer />
 
       {/* Refresh replays the desktop with a single pass of light. */}
       <RefreshSweep />

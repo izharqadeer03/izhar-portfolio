@@ -179,6 +179,11 @@ const COMMANDS: CommandDefinition[] = [
     run: () => shortcut('resume'),
   },
   {
+    name: 'ai',
+    summary: 'Open AI Lab & Assistant.',
+    run: () => shortcut('ai-lab'),
+  },
+  {
     name: 'contact',
     summary: 'How to reach me.',
     run: () => ({

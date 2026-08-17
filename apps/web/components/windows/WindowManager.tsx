@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence } from 'motion/react';
+import { useEffect } from 'react';
 
 import { Window } from '@/components/windows/Window';
 import { useIsMobile } from '@/hooks/useSystemPreferences';
@@ -17,7 +18,26 @@ import { useWindowStore } from '@/lib/store/window-store';
 export function WindowManager() {
   const windows = useWindowStore((state) => state.windows);
   const focusedId = useWindowStore((state) => state.focusedId);
+  const reconcileViewport = useWindowStore((state) => state.reconcileViewport);
   const isMobile = useIsMobile();
+
+  // Re-clamp every window after a viewport resize or orientation change so none
+  // strand off-screen. Debounced to avoid churn during a continuous drag-resize.
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(reconcileViewport, 120);
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, [reconcileViewport]);
 
   const visible = isMobile
     ? windows.filter((instance) => instance.id === focusedId && !instance.isMinimized)
@@ -38,3 +58,4 @@ export function WindowManager() {
     </div>
   );
 }
+

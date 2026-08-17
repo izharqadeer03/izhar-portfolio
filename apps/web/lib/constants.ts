@@ -19,3 +19,10 @@ export const WINDOW_CASCADE_STEP = 30;
 
 /** How much of a window must stay on screen while dragging. */
 export const WINDOW_DRAG_MARGIN = 96;
+
+/** Distance in pixels from the viewport edge that triggers a window snap zone. */
+export const SNAP_THRESHOLD = 16;
+
+/** Maximum number of toast notifications visible at once. */
+export const TOAST_MAX_VISIBLE = 3;
+

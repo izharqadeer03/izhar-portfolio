@@ -1,11 +1,14 @@
 'use client';
 
 import { MOTION } from '@izhar-os/config';
-import { SectionLabel } from '@izhar-os/ui';
+import { OSButton, SectionLabel } from '@izhar-os/ui';
+import { Bell } from 'lucide-react';
 import { motion } from 'motion/react';
 
 import { AppTile } from '@/components/applications/AppIcon';
 import type { ApplicationViewProps } from '@/components/applications/ApplicationRegistry';
+import { useApplicationChrome } from '@/hooks/useEnvironment';
+import { useToastStore } from '@/lib/store/toast-store';
 
 /**
  * The placeholder every unshipped application uses.
@@ -16,6 +19,9 @@ import type { ApplicationViewProps } from '@/components/applications/Application
  * rather than a demo with dead links.
  */
 export function ComingSoonApp({ application }: ApplicationViewProps) {
+  const chrome = useApplicationChrome();
+  const addToast = useToastStore((state) => state.addToast);
+
   return (
     <div className="os-selectable flex h-full flex-col items-center justify-center px-8 py-10 text-center">
       <motion.div
@@ -29,7 +35,8 @@ export function ComingSoonApp({ application }: ApplicationViewProps) {
           {/* A single soft ring, so the tile reads as dormant rather than broken. */}
           <div
             aria-hidden="true"
-            className="absolute -inset-3 rounded-[30%] border border-line/60 opacity-60"
+            className="absolute -inset-3 border border-line/60 opacity-60"
+            style={{ borderRadius: `${chrome.cardRadius + 6}px` }}
           />
         </div>
 
@@ -45,7 +52,8 @@ export function ComingSoonApp({ application }: ApplicationViewProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.34, delay: 0.06, ease: MOTION.easeOut }}
-          className="mt-9 w-full max-w-[320px] rounded-lg border border-line bg-void/40 p-4 text-left"
+          className="mt-9 w-full max-w-[320px] border border-line bg-void/40 p-4 text-left"
+          style={{ borderRadius: chrome.cardRadius }}
         >
           <div className="flex items-center justify-between">
             <SectionLabel>Planned</SectionLabel>
@@ -67,9 +75,28 @@ export function ComingSoonApp({ application }: ApplicationViewProps) {
         </motion.div>
       ) : null}
 
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.14, ease: MOTION.easeOut }}
+        className="mt-7"
+      >
+        <OSButton
+          size="sm"
+          variant="ghost"
+          onClick={() =>
+            addToast(`${application.title} will ship in a future update.`, 'info')
+          }
+        >
+          <Bell size={13} strokeWidth={1.8} aria-hidden="true" />
+          <span>Notify Me</span>
+        </OSButton>
+      </motion.div>
+
       <p className="mt-8 font-mono text-[10px] tracking-[0.16em] text-faint uppercase">
         {application.description}
       </p>
     </div>
   );
 }
+

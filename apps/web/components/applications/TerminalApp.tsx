@@ -176,7 +176,13 @@ export function TerminalApp() {
       }}
     >
       {blocks.map((block) => (
-        <div key={block.id} className={block.input !== null ? 'mt-2 first:mt-0' : ''}>
+        <div
+          key={block.id}
+          className={block.input !== null ? 'mt-2 first:mt-0' : ''}
+          style={{
+            animation: block.id > 0 ? 'toast-in 180ms var(--ease-env) backwards' : undefined,
+          }}
+        >
           {block.input !== null ? (
             <p className="flex flex-wrap items-baseline gap-x-2">
               <Prompt />
@@ -189,7 +195,7 @@ export function TerminalApp() {
               key={index}
               className={cn('whitespace-pre-wrap', TONE_CLASS[entry.tone ?? 'default'])}
             >
-              {entry.text || ' '}
+              {entry.text || ' '}
             </p>
           ))}
         </div>
@@ -211,7 +217,7 @@ export function TerminalApp() {
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck={false}
-            className="w-full bg-transparent text-fg caret-transparent outline-none"
+            className="w-full bg-transparent text-fg caret-transparent outline-none min-h-[44px] sm:min-h-0"
           />
 
           {/* Block caret, positioned from the text width so it tracks the

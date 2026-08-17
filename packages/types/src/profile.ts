@@ -77,3 +77,129 @@ export interface AboutProfile {
   /** What I am actively exploring right now. */
   interests: string[];
 }
+
+/** Experience domain */
+export interface ExperienceItem {
+  id: string;
+  role: string;
+  company: string;
+  companyUrl?: string;
+  location: string;
+  period: string;
+  duration: string;
+  current?: boolean;
+  summary: string;
+  focusAreas?: string[];
+  achievements: string[];
+  technologies: string[];
+  metrics?: { label: string; value: string }[];
+  relatedProjects?: string[];
+}
+
+/** Skills domain */
+export type SkillCategoryId =
+  | 'languages'
+  | 'backend'
+  | 'databases-search'
+  | 'ai-llm'
+  | 'realtime-distributed'
+  | 'cloud-devops'
+  | 'frontend'
+  | 'apis-integrations';
+
+export interface SkillCategory {
+  id: SkillCategoryId;
+  name: string;
+  shortName: string;
+  description: string;
+  icon: string;
+  accent: AccentKey;
+}
+
+export interface SkillItem {
+  id: string;
+  name: string;
+  category: SkillCategoryId;
+  level: 'Core / Advanced' | 'Proficient' | 'Working Knowledge';
+  years: string;
+  featured?: boolean;
+  icon?: string;
+  description: string;
+  architecturalRole?: string;
+  contextNote?: string;
+  capabilities?: string[];
+  tags?: string[];
+  relatedProjects?: string[];
+}
+
+/** Resume domain */
+export interface EducationEntry {
+  institution: string;
+  degree: string;
+  period: string;
+  location: string;
+  details?: string[];
+}
+
+export interface CertificationEntry {
+  name: string;
+  issuer: string;
+  year: string;
+  url?: string;
+}
+
+export interface ResumeData {
+  name: string;
+  title: string;
+  summary: string;
+  location: string;
+  email: string;
+  education: EducationEntry[];
+  certifications: CertificationEntry[];
+  competencies: { category: string; skills: string[] }[];
+}
+
+/** Contact domain */
+export interface ContactChannel {
+  id: string;
+  label: string;
+  value: string;
+  href: string;
+  icon: string;
+  copyable?: boolean;
+  primary?: boolean;
+}
+
+export interface ContactTopic {
+  id: string;
+  label: string;
+  description: string;
+}
+
+export interface ContactConfig {
+  email: string;
+  location: string;
+  timezone: string;
+  availability: {
+    status: string;
+    notice: string;
+    preferredRoles: string[];
+  };
+  channels: ContactChannel[];
+  topics: ContactTopic[];
+}
+
+/** AI Assistant / Lab domain */
+export interface AiMessage {
+  id: string;
+  sender: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: number;
+  toolCall?: {
+    name: string;
+    args?: Record<string, unknown>;
+    result?: string;
+  };
+  suggestions?: string[];
+}
+

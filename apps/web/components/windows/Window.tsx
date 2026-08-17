@@ -17,7 +17,7 @@ import { WindowContent } from '@/components/windows/WindowContent';
 import { WindowHeader } from '@/components/windows/WindowHeader';
 import { usePrefersReducedMotion } from '@/hooks/useSystemPreferences';
 import { useEnvironmentMotion, useWindowChrome } from '@/hooks/useEnvironment';
-import { MOBILE_DOCK_HEIGHT, MOBILE_STATUSBAR_HEIGHT, WINDOW_DRAG_MARGIN } from '@/lib/constants';
+import { MOBILE_DOCK_HEIGHT, MOBILE_STATUSBAR_HEIGHT, SNAP_THRESHOLD, WINDOW_DRAG_MARGIN } from '@/lib/constants';
 import { getWorkArea, useWindowStore } from '@/lib/store/window-store';
 import { clamp } from '@/lib/utils';
 
@@ -67,6 +67,7 @@ export function Window({ instance, isFocused, isMobile }: WindowProps) {
   const motionSpec = useEnvironmentMotion();
   const frameRef = useRef<HTMLDivElement>(null);
   const [gesture, setGesture] = useState<'drag' | 'resize' | null>(null);
+  const [snapZone, setSnapZone] = useState<'left' | 'right' | 'top' | null>(null);
   const reducedMotion = usePrefersReducedMotion();
 
   const focusWindow = useWindowStore((state) => state.focusWindow);
@@ -75,6 +76,26 @@ export function Window({ instance, isFocused, isMobile }: WindowProps) {
   const toggleMaximize = useWindowStore((state) => state.toggleMaximize);
   const setWindowPosition = useWindowStore((state) => state.setWindowPosition);
   const setWindowBounds = useWindowStore((state) => state.setWindowBounds);
+
+  const snapWindowLeft = useCallback((id: string) => {
+    const area = getWorkArea();
+    setWindowBounds(id, {
+      x: area.left,
+      y: area.top,
+      width: Math.round(area.width / 2),
+      height: area.height,
+    });
+  }, [setWindowBounds]);
+
+  const snapWindowRight = useCallback((id: string) => {
+    const area = getWorkArea();
+    setWindowBounds(id, {
+      x: area.left + Math.round(area.width / 2),
+      y: area.top,
+      width: Math.round(area.width / 2),
+      height: area.height,
+    });
+  }, [setWindowBounds]);
 
   const dragX = useMotionValue(0);
   const dragY = useMotionValue(0);
@@ -115,6 +136,17 @@ export function Window({ instance, isFocused, isMobile }: WindowProps) {
 
         dragX.set(nextX - originX);
         dragY.set(nextY - originY);
+
+        // Snap zone detection: top edge = maximize, left/right = half-screen.
+        if (moveEvent.clientY <= area.top + SNAP_THRESHOLD) {
+          setSnapZone('top');
+        } else if (moveEvent.clientX <= area.left + SNAP_THRESHOLD) {
+          setSnapZone('left');
+        } else if (moveEvent.clientX >= area.left + area.width - SNAP_THRESHOLD) {
+          setSnapZone('right');
+        } else {
+          setSnapZone(null);
+        }
       };
 
       const handleUp = () => {
@@ -122,6 +154,29 @@ export function Window({ instance, isFocused, isMobile }: WindowProps) {
         window.removeEventListener('pointerup', handleUp);
         window.removeEventListener('pointercancel', handleUp);
         setGesture(null);
+
+        const currentSnap = snapZone;
+        setSnapZone(null);
+
+        // Apply snap zone action.
+        if (currentSnap === 'top') {
+          dragX.set(0);
+          dragY.set(0);
+          toggleMaximize(id);
+          return;
+        }
+        if (currentSnap === 'left') {
+          dragX.set(0);
+          dragY.set(0);
+          snapWindowLeft(id);
+          return;
+        }
+        if (currentSnap === 'right') {
+          dragX.set(0);
+          dragY.set(0);
+          snapWindowRight(id);
+          return;
+        }
 
         const nextX = originX + dragX.get();
         const nextY = originY + dragY.get();
@@ -149,6 +204,10 @@ export function Window({ instance, isFocused, isMobile }: WindowProps) {
       position.y,
       setWindowPosition,
       size.width,
+      snapZone,
+      snapWindowLeft,
+      snapWindowRight,
+      toggleMaximize,
     ],
   );
 
@@ -290,8 +349,8 @@ export function Window({ instance, isFocused, isMobile }: WindowProps) {
           ? 'none'
           : 'left 260ms var(--ease-env), top 260ms var(--ease-env), width 260ms var(--ease-env), height 260ms var(--ease-env), border-color 200ms var(--ease-env), border-radius 260ms var(--ease-env), box-shadow 260ms var(--ease-env)',
         boxShadow: isFocused
-          ? '0 28px 70px -24px rgba(0,0,0,0.92), 0 0 0 1px rgba(255,255,255,0.035), inset 0 1px 0 rgba(255,255,255,0.05)'
-          : '0 16px 40px -22px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.03)',
+          ? '0 28px 70px -24px rgba(0,0,0,0.92), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06)'
+          : '0 12px 28px -16px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.025)',
         pointerEvents: isMinimized ? 'none' : 'auto',
       }}
       // A window opens the way its environment opens windows: Fluent lifts it

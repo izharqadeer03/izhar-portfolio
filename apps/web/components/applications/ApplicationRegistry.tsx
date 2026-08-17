@@ -5,8 +5,14 @@ import type { ApplicationDefinition, ApplicationId } from '@izhar-os/types';
 import { createElement, type ComponentType } from 'react';
 
 import { AboutApp } from '@/components/applications/about/AboutApp';
+import { AiLabApp } from '@/components/applications/ai/AiLabApp';
 import { ComingSoonApp } from '@/components/applications/ComingSoonApp';
+import { ContactApp } from '@/components/applications/contact/ContactApp';
+import { ExperienceApp } from '@/components/applications/experience/ExperienceApp';
 import { FilesApp } from '@/components/applications/FilesApp';
+import { ProjectsApp } from '@/components/applications/projects/ProjectsApp';
+import { ResumeApp } from '@/components/applications/resume/ResumeApp';
+import { SkillsApp } from '@/components/applications/skills/SkillsApp';
 import { SystemInformationApp } from '@/components/applications/SystemInformationApp';
 import { TerminalApp } from '@/components/applications/TerminalApp';
 
@@ -24,16 +30,17 @@ export interface ApplicationViewProps {
  * code changes, and an unregistered application degrades to its placeholder
  * rather than to a blank window.
  */
-const APPLICATION_VIEWS: Partial<Record<ApplicationId, ComponentType<ApplicationViewProps>>> = {
+const APPLICATION_VIEWS: Record<ApplicationId, ComponentType<ApplicationViewProps>> = {
   'system-info': SystemInformationApp,
-  // These render themselves differently per environment, and none is
-  // registered more than once — the environment is read inside the view, not
-  // selected out here.
   about: AboutApp,
+  projects: ProjectsApp,
+  experience: ExperienceApp,
+  skills: SkillsApp,
+  'ai-lab': AiLabApp,
+  resume: ResumeApp,
+  contact: ContactApp,
   files: FilesApp,
   terminal: TerminalApp,
-  // Phase 2 continues with projects / experience / skills / resume / contact.
-  // Phase 3 registers ai-lab.
 };
 
 /**

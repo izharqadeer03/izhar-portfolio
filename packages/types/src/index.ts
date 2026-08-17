@@ -12,10 +12,21 @@ export type { EnvironmentDefinition, EnvironmentId, EnvironmentLogo } from './en
 
 export type {
   AboutProfile,
+  AiMessage,
   BuildArea,
+  CertificationEntry,
+  ContactChannel,
+  ContactConfig,
+  ContactTopic,
+  EducationEntry,
+  ExperienceItem,
   FocusArea,
   JourneyStage,
   ProfileStat,
+  ResumeData,
+  SkillCategory,
+  SkillCategoryId,
+  SkillItem,
   StackGroup,
 } from './profile';
 
@@ -32,4 +43,15 @@ export type {
   SystemLink,
   SystemProfile,
   SystemStatus,
-} from './system';
+} from './system';export type {
+  ArchitectureFlow,
+  ArchitectureNode,
+  ArchitectureNodeType,
+  Project,
+  ProjectArchitecture,
+  ProjectCategory,
+  ProjectCategoryId,
+  ProjectChallenge,
+  ProjectLink,
+  ProjectStat,
+} from './project';

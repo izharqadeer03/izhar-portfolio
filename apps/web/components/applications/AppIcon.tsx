@@ -8,6 +8,7 @@ import {
   Boxes,
   CircuitBoard,
   Cloud,
+  Code2,
   Cpu,
   Database,
   FileText,
@@ -21,7 +22,7 @@ import {
   UserRound,
   Waypoints,
 } from 'lucide-react';
-import type { CSSProperties } from 'react';
+import { memo, type CSSProperties } from 'react';
 
 import { useEnvironment } from '@/hooks/useEnvironment';
 import { DESKTOP_ICONS, type TileFinish } from '@/lib/environment';
@@ -42,6 +43,7 @@ const GLYPHS: Record<string, LucideIcon> = {
   terminal: Terminal,
   system: Cpu,
   mail: Mail,
+  code: Code2,
   // Categories of work, used by the About application.
   interface: AppWindow,
   server: Server,
@@ -77,10 +79,15 @@ export interface AppGlyphProps {
 }
 
 /** The bare glyph — used in the taskbar, window headers and menus. */
-export function AppGlyph({ icon, size = 16, className, strokeWidth = 1.6 }: AppGlyphProps) {
+export const AppGlyph = memo(function AppGlyph({
+  icon,
+  size = 16,
+  className,
+  strokeWidth = 1.6,
+}: AppGlyphProps) {
   const Glyph = GLYPHS[icon] ?? Boxes;
   return <Glyph size={size} strokeWidth={strokeWidth} className={className} aria-hidden="true" />;
-}
+});
 
 /**
  * The three materials a tile can be made of.
@@ -164,7 +171,7 @@ export interface AppTileProps {
  * Built from CSS rather than bitmaps, so it stays crisp at every size the OS
  * uses it and costs nothing to restyle.
  */
-export function AppTile({
+export const AppTile = memo(function AppTile({
   icon,
   accent,
   size = 46,
@@ -229,4 +236,5 @@ export function AppTile({
       </span>
     </span>
   );
-}
+});
+

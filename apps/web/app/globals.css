@@ -159,6 +159,7 @@
      * ------------------------------------------------------------------- */
     --env-accent: #4cc2ff;
     --env-accent-quiet: color-mix(in oklab, var(--env-accent) 16%, transparent);
+    --env-accent-strong: color-mix(in oklab, var(--env-accent) 55%, transparent);
 
     color-scheme: dark;
   }
@@ -403,6 +404,22 @@
     opacity: 1;
     transform: translate(-50%, 0);
   }
+
+  /* Consistent focus ring across all interactive elements. Uses the
+     environment's own accent so the ring belongs to the desktop. */
+  .os-focus-ring {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--env-accent) 55%, transparent);
+  }
+
+  /* Toast notifications. */
+  .os-toast-enter {
+    animation: toast-in 280ms var(--ease-env) backwards;
+  }
+
+  .os-toast-exit {
+    animation: toast-out 220ms var(--ease-env) forwards;
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -423,5 +440,41 @@
 @media (hover: none) {
   .os-tip::after {
     display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Toast and snap animations
+ * ------------------------------------------------------------------------- */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+@keyframes snap-preview {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
