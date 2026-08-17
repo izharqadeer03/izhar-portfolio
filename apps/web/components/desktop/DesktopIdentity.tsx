@@ -123,14 +123,18 @@ export function DesktopIdentity() {
       )}
       style={clearance}
     >
-      <motion.h1 key={`${environment}-name`} {...rise(0.05)} className={cn('text-fg', style.name)}>
+      <motion.h1
+        key={`${environment}-name`}
+        {...rise(0.05)}
+        className={cn('text-fg drop-shadow-[0_2px_16px_rgba(0,0,0,0.85)]', style.name)}
+      >
         {SYSTEM_PROFILE.name}
       </motion.h1>
 
       <motion.p
         key={`${environment}-role`}
         {...rise(0.11)}
-        className={cn('env-accent', style.role)}
+        className={cn('env-accent font-semibold drop-shadow-[0_1px_8px_rgba(0,0,0,0.75)]', style.role)}
       >
         {SYSTEM_PROFILE.role}
       </motion.p>
@@ -139,7 +143,7 @@ export function DesktopIdentity() {
         key={`${environment}-disciplines`}
         {...rise(0.16)}
         className={cn(
-          'flex flex-wrap items-center text-muted',
+          'flex flex-wrap items-center text-slate-200/95 font-medium drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)]',
           style.disciplines,
           isMobile && 'justify-center',
         )}
@@ -147,7 +151,7 @@ export function DesktopIdentity() {
         {SYSTEM_PROFILE.disciplines.map((discipline, index) => (
           <span key={discipline} className="flex items-center gap-3">
             {index > 0 ? (
-              <span className="size-[3px] rounded-full bg-faint" aria-hidden="true" />
+              <span className="size-[3.5px] rounded-full bg-white/40" aria-hidden="true" />
             ) : null}
             <span>{discipline}</span>
           </span>
@@ -158,7 +162,7 @@ export function DesktopIdentity() {
         key={`${environment}-statement`}
         {...rise(0.21)}
         className={cn(
-          'text-faint',
+          'text-slate-200/90 font-normal leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]',
           isMobile ? 'mt-5 max-w-[38ch] text-center text-[13.5px]' : style.statement,
         )}
       >
@@ -169,12 +173,12 @@ export function DesktopIdentity() {
         key={`${environment}-status`}
         {...rise(0.26)}
         className={cn(
-          'mt-6 flex items-center gap-2 rounded-full border border-line bg-surface/45 px-3 py-1.5 backdrop-blur-xl',
+          'mt-6 flex items-center gap-2 rounded-full border border-white/10 bg-surface/65 px-3.5 py-1.5 backdrop-blur-xl shadow-lg',
           align === 'center' ? 'self-center' : 'self-start',
         )}
       >
         <StatusDot state={SYSTEM_PROFILE.status.state} />
-        <span className="text-[11.5px] font-medium text-fg/85">
+        <span className="text-[11.5px] font-medium text-fg">
           {SYSTEM_PROFILE.status.label} for opportunities
         </span>
       </motion.p>

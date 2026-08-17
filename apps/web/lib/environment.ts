@@ -277,38 +277,34 @@ export interface IconStyleSpec {
  */
 export const DESKTOP_ICONS: Record<EnvironmentId, IconStyleSpec> = {
   windows: {
-    cell: { comfortable: { width: 92, height: 104 }, compact: { width: 76, height: 84 } },
-    tile: { comfortable: 46, compact: 38 },
+    cell: { comfortable: { width: 92, height: 104 }, compact: { width: 78, height: 86 } },
+    tile: { comfortable: 50, compact: 40 },
     tileRadius: '22%',
     finish: 'fluent',
-    // A white glyph on a lit plate already carries; drawn at Yaru's weight it
-    // reads as bold. Fluent's own set is a thin line held clear of the edges.
-    glyphRatio: 0.46,
+    glyphRatio: 0.48,
     glyphStroke: 1.5,
-    labelClass: 'text-[11.5px] leading-tight tracking-tight',
-    cellRadiusClass: 'rounded-md',
+    labelClass: 'text-[12px] leading-tight tracking-tight',
+    cellRadiusClass: 'rounded-lg',
   },
   macos: {
     cell: { comfortable: { width: 104, height: 116 }, compact: { width: 86, height: 96 } },
     tile: { comfortable: 56, compact: 46 },
     tileRadius: '23%',
     finish: 'aqua',
-    // Aqua's glyphs are lighter still than Fluent's, and sit on a bigger tile.
     glyphRatio: 0.48,
     glyphStroke: 1.45,
-    labelClass: 'text-[11px] font-medium leading-tight tracking-[-0.005em]',
+    labelClass: 'text-[11.5px] font-medium leading-tight tracking-[-0.005em]',
     cellRadiusClass: 'rounded-xl',
   },
   linux: {
-    cell: { comfortable: { width: 84, height: 96 }, compact: { width: 72, height: 80 } },
-    tile: { comfortable: 40, compact: 34 },
-    // Yaru's app icons are discs; nothing else on the desktop is this round.
+    cell: { comfortable: { width: 88, height: 100 }, compact: { width: 74, height: 84 } },
+    tile: { comfortable: 48, compact: 38 },
     tileRadius: '50%',
     finish: 'yaru',
     glyphRatio: 0.48,
     glyphStroke: 2,
-    labelClass: 'font-mono text-[11px] leading-tight tracking-[0.005em]',
-    cellRadiusClass: 'rounded',
+    labelClass: 'font-mono text-[11.5px] leading-tight tracking-[0.005em]',
+    cellRadiusClass: 'rounded-lg',
   },
 };
 

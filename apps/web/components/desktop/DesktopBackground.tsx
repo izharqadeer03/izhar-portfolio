@@ -9,7 +9,8 @@ import { useDeviceCapability } from '@/hooks/useDeviceCapability';
 import { useDocumentVisible } from '@/hooks/useDocumentVisibility';
 import { useEnvironment, useEnvironmentDefinition } from '@/hooks/useEnvironment';
 import { useSystemStore } from '@/lib/store/system-store';
-import { WALLPAPERS } from '@/lib/wallpaper';
+import { useThemeStore, THEME_PRESETS, DEFAULT_THEME_ID } from '@/lib/store/theme-store';
+import { getWallpaperSpec, WALLPAPERS } from '@/lib/wallpaper';
 
 // Three.js stays out of the initial bundle entirely — the boot sequence must
 // never wait on the environment.
@@ -41,11 +42,22 @@ export function DesktopBackground() {
   const environment = useEnvironmentDefinition();
   const [sceneFailed, setSceneFailed] = useState(false);
 
+  const themeId = useThemeStore((state) => state.themeId);
+  const wallpaperId = useThemeStore((state) => state.wallpaperId);
+  const preset = THEME_PRESETS[themeId] ?? THEME_PRESETS[DEFAULT_THEME_ID]!;
+
   const environmentReady = bootPhase === 'revealing' || bootPhase === 'ready';
   const showScene = useWebGL && environmentReady && !sceneFailed;
-  const { ambient } = environment;
-  const wallpaper = WALLPAPERS[environmentId];
-  const gridStrength = ambient.grid * wallpaper.grid;
+
+  const ambientPrimary = environmentId === 'windows' ? preset.ambientPrimary : environment.ambient.primary;
+  const ambientSecondary = environmentId === 'windows' ? preset.ambientSecondary : environment.ambient.secondary;
+
+  const wallpaper =
+    environmentId === 'windows'
+      ? getWallpaperSpec(wallpaperId, environmentId)
+      : WALLPAPERS[environmentId];
+
+  const gridStrength = environment.ambient.grid * wallpaper.grid;
 
   return (
     <div
@@ -63,14 +75,14 @@ export function DesktopBackground() {
         className="absolute -top-[25%] -left-[15%] size-[70vw] rounded-full blur-[100px] transition-[background,opacity] duration-700 motion-safe:animate-drift"
         style={{
           opacity: wallpaper.ambient,
-          background: `radial-gradient(circle, color-mix(in oklab, ${ambient.primary} 16%, transparent) 0%, transparent 68%)`,
+          background: `radial-gradient(circle, color-mix(in oklab, ${ambientPrimary} 18%, transparent) 0%, transparent 68%)`,
         }}
       />
       <div
         className="absolute -right-[12%] -bottom-[30%] size-[62vw] rounded-full blur-[110px] transition-[background,opacity] duration-700 motion-safe:animate-drift"
         style={{
           opacity: wallpaper.ambient * 0.86,
-          background: `radial-gradient(circle, color-mix(in oklab, ${ambient.secondary} 14%, transparent) 0%, transparent 68%)`,
+          background: `radial-gradient(circle, color-mix(in oklab, ${ambientSecondary} 16%, transparent) 0%, transparent 68%)`,
           animationDelay: '-13s',
         }}
       />

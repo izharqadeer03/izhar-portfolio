@@ -1,30 +1,31 @@
 'use client';
 
 import Image from 'next/image';
+import { useEffect } from 'react';
 
 import { useEnvironment } from '@/hooks/useEnvironment';
-import { WALLPAPERS } from '@/lib/wallpaper';
+import { useThemeStore } from '@/lib/store/theme-store';
+import { getWallpaperSpec, WALLPAPERS } from '@/lib/wallpaper';
 
-/**
- * The desktop's ground image.
- *
- * Rendered through `next/image` from a static import, which is what buys the
- * three things a wallpaper needs and a raw `background-image` cannot give it:
- * a responsive `srcset` so a phone never downloads the 4K plate, automatic
- * AVIF/WebP conversion, and a build-time blur placeholder so the first paint is
- * the wallpaper's own colour instead of a flash of void.
- *
- * It mounts before the boot screen lifts — the fetch happens behind the boot
- * sequence, so the desktop is already wearing its wallpaper the moment it is
- * revealed.
- */
 export function DesktopWallpaper() {
   const environment = useEnvironment();
-  const wallpaper = WALLPAPERS[environment];
+  const wallpaperId = useThemeStore((state) => state.wallpaperId);
+  const hydrate = useThemeStore((state) => state.hydrate);
+
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+
+  // For Windows, use the theme-chosen wallpaper; for mac/linux, use default unless specified
+  const wallpaper =
+    environment === 'windows'
+      ? getWallpaperSpec(wallpaperId, environment)
+      : WALLPAPERS[environment];
 
   return (
     <>
       <Image
+        key={wallpaper.id}
         src={wallpaper.image}
         alt=""
         fill
@@ -32,21 +33,17 @@ export function DesktopWallpaper() {
         // One image, always full-bleed: no layout to guess at.
         sizes="100vw"
         placeholder="blur"
-        className="object-cover transition-[filter] duration-700"
+        className="object-cover transition-[filter,opacity] duration-700"
         style={{ objectPosition: wallpaper.position, filter: wallpaper.filter }}
       />
 
-      {/* Scrim, over the already-filtered image. Weighted to both ends — the top
-          carries the menu bar and the bottom the taskbar or dock — and kept
-          nearly as strong through the middle, because the middle is where the
-          identity block stands and a wallpaper band running under a line of
-          type is exactly where legibility is lost. */}
+      {/* Scrim with central legibility wash for crystal-clear text contrast */}
       <div
-        className="absolute inset-0 transition-opacity duration-700"
+        className="absolute inset-0 transition-opacity duration-700 pointer-events-none"
         style={{
           opacity: wallpaper.scrim,
           background:
-            'linear-gradient(to bottom, rgba(5,6,8,0.8) 0%, rgba(5,6,8,0.66) 45%, rgba(5,6,8,0.92) 100%)',
+            'radial-gradient(ellipse 70% 50% at 50% 40%, rgba(5,6,8,0.55) 0%, rgba(5,6,8,0.85) 100%), linear-gradient(to bottom, rgba(5,6,8,0.8) 0%, rgba(5,6,8,0.5) 45%, rgba(5,6,8,0.92) 100%)',
         }}
       />
     </>

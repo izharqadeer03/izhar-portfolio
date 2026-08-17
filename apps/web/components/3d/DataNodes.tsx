@@ -1,10 +1,10 @@
 'use client';
 
-import { PALETTE } from '@izhar-os/config';
 import { useFrame } from '@react-three/fiber';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
+import { useThemeStore, THEME_PRESETS, DEFAULT_THEME_ID } from '@/lib/store/theme-store';
 import { seededRandom } from '@/lib/utils';
 
 interface DataNodesProps {
@@ -27,19 +27,20 @@ const LINK_DISTANCE = 3.1;
 
 /**
  * Builds the constellation once, deterministically.
- *
- * Nodes sit on a wide cylindrical band around the origin rather than filling a
- * volume, which leaves the centre of frame empty. That hole is the composition:
- * it is where the desktop's icons, windows and branding live.
  */
-function buildLayout(count: number, showConnections: boolean): NodeLayout {
+function buildLayout(
+  count: number,
+  showConnections: boolean,
+  accentHex: string,
+  secondaryHex: string,
+): NodeLayout {
   const positions: THREE.Vector3[] = [];
   const scales: number[] = [];
   const colors: THREE.Color[] = [];
 
-  const accent = new THREE.Color(PALETTE.accent);
-  const violet = new THREE.Color(PALETTE.violet);
-  const neutral = new THREE.Color('#9fb0c6');
+  const accent = new THREE.Color(accentHex);
+  const secondary = new THREE.Color(secondaryHex);
+  const neutral = new THREE.Color('#d1dbe8');
 
   for (let index = 0; index < count; index += 1) {
     const radius = 3.4 + seededRandom(index * 3.1) * 3.6;
@@ -50,11 +51,11 @@ function buildLayout(count: number, showConnections: boolean): NodeLayout {
       new THREE.Vector3(Math.cos(theta) * radius, height, Math.sin(theta) * radius * 0.85 - 1.6),
     );
 
-    scales.push(0.055 + seededRandom(index * 11.9) * 0.075);
+    scales.push(0.06 + seededRandom(index * 11.9) * 0.08);
 
-    // Mostly neutral, with a minority of accented nodes. Restraint is the point.
+    // Mostly neutral, with a minority of accented nodes.
     const tint = seededRandom(index * 13.3);
-    colors.push(tint > 0.86 ? accent : tint > 0.72 ? violet : neutral);
+    colors.push(tint > 0.84 ? accent : tint > 0.68 ? secondary : neutral);
   }
 
   if (!showConnections) {
@@ -70,7 +71,7 @@ function buildLayout(count: number, showConnections: boolean): NodeLayout {
   const linkCounts = new Array<number>(count).fill(0);
   const segments: number[] = [];
   const segmentColors: number[] = [];
-  const linkColor = new THREE.Color(PALETTE.accent);
+  const linkColor = new THREE.Color(accentHex);
 
   for (let a = 0; a < count; a += 1) {
     for (let b = a + 1; b < count; b += 1) {
@@ -105,14 +106,19 @@ function buildLayout(count: number, showConnections: boolean): NodeLayout {
 }
 
 /**
- * The constellation of nodes and links — the scene's statement of intent:
- * systems, data, connections. Instanced, so 30-odd nodes cost one draw call.
+ * The constellation of nodes and links.
  */
 export function DataNodes({ count, showConnections }: DataNodesProps) {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.InstancedMesh>(null);
 
-  const layout = useMemo(() => buildLayout(count, showConnections), [count, showConnections]);
+  const themeId = useThemeStore((state) => state.themeId);
+  const preset = THEME_PRESETS[themeId] ?? THEME_PRESETS[DEFAULT_THEME_ID]!;
+
+  const layout = useMemo(
+    () => buildLayout(count, showConnections, preset.accent, preset.secondary),
+    [count, showConnections, preset.accent, preset.secondary],
+  );
 
   const lineGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
@@ -138,15 +144,12 @@ export function DataNodes({ count, showConnections }: DataNodesProps) {
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }, [layout]);
 
-  // One slow rotation for the whole constellation. No per-node animation:
-  // the parallax from the camera rig already supplies the sense of life.
   useFrame((_, delta) => {
     const group = groupRef.current;
     if (!group) return;
     group.rotation.y += delta * 0.012;
   });
 
-  // Geometry and material are shared across instances; dispose is handled by R3F.
   return (
     <group ref={groupRef}>
       <instancedMesh
@@ -157,10 +160,10 @@ export function DataNodes({ count, showConnections }: DataNodesProps) {
       >
         <octahedronGeometry args={[1, 0]} />
         <meshStandardMaterial
-          roughness={0.35}
-          metalness={0.15}
-          emissive={PALETTE.accent}
-          emissiveIntensity={0.18}
+          roughness={0.25}
+          metalness={0.2}
+          emissive={preset.accent}
+          emissiveIntensity={0.25}
           toneMapped={false}
         />
       </instancedMesh>
@@ -170,7 +173,7 @@ export function DataNodes({ count, showConnections }: DataNodesProps) {
           <lineBasicMaterial
             vertexColors
             transparent
-            opacity={0.34}
+            opacity={0.4}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             toneMapped={false}

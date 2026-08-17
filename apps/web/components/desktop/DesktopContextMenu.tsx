@@ -2,12 +2,14 @@
 
 import type { IconDensity } from '@izhar-os/types';
 import { cn, Separator } from '@izhar-os/ui';
-import { Check, ChevronRight, Cpu, Grid2x2, LayoutGrid, RefreshCw } from 'lucide-react';
+import { Check, ChevronRight, Cpu, Grid2x2, LayoutGrid, Palette, RefreshCw, Sparkles } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { PersonalizationModal } from '@/components/desktop/PersonalizationModal';
 import { useDismiss } from '@/hooks/useDismiss';
 import { useSystemStore } from '@/lib/store/system-store';
+import { THEME_PRESETS, useThemeStore } from '@/lib/store/theme-store';
 import { useWindowStore } from '@/lib/store/window-store';
 
 export interface ContextMenuAnchor {
@@ -20,8 +22,8 @@ interface DesktopContextMenuProps {
   onClose: () => void;
 }
 
-const MENU_WIDTH = 216;
-const MENU_HEIGHT_ESTIMATE = 200;
+const MENU_WIDTH = 224;
+const MENU_HEIGHT_ESTIMATE = 240;
 
 const ITEM =
   'flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-left text-[12.5px] text-fg/90 ' +
@@ -37,9 +39,18 @@ function MenuDivider() {
   );
 }
 
-function ContextMenuPanel({ anchor, onClose }: { anchor: ContextMenuAnchor; onClose: () => void }) {
+function ContextMenuPanel({
+  anchor,
+  onClose,
+  onOpenPersonalize,
+}: {
+  anchor: ContextMenuAnchor;
+  onClose: () => void;
+  onOpenPersonalize: () => void;
+}) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [viewOpen, setViewOpen] = useState(false);
+  const [themeOpen, setThemeOpen] = useState(false);
 
   const iconDensity = useSystemStore((state) => state.iconDensity);
   const iconsVisible = useSystemStore((state) => state.iconsVisible);
@@ -48,6 +59,9 @@ function ContextMenuPanel({ anchor, onClose }: { anchor: ContextMenuAnchor; onCl
   const refreshDesktop = useSystemStore((state) => state.refreshDesktop);
   const arrangeIcons = useSystemStore((state) => state.arrangeIcons);
   const openWindow = useWindowStore((state) => state.openWindow);
+
+  const activeThemeId = useThemeStore((state) => state.themeId);
+  const setTheme = useThemeStore((state) => state.setTheme);
 
   const close = useCallback(() => onClose(), [onClose]);
   useDismiss(menuRef, { enabled: true, onDismiss: close });
@@ -71,6 +85,11 @@ function ContextMenuPanel({ anchor, onClose }: { anchor: ContextMenuAnchor; onCl
     close();
   };
 
+  const chooseTheme = (id: string) => () => {
+    setTheme(id);
+    close();
+  };
+
   // Flip back inside the viewport when opened near an edge.
   const left = Math.max(8, Math.min(anchor.x, window.innerWidth - MENU_WIDTH - 8));
   const top = Math.max(8, Math.min(anchor.y, window.innerHeight - MENU_HEIGHT_ESTIMATE - 8));
@@ -80,7 +99,7 @@ function ContextMenuPanel({ anchor, onClose }: { anchor: ContextMenuAnchor; onCl
       ref={menuRef}
       role="menu"
       aria-label="Desktop options"
-      className="fixed z-150 rounded-xl border border-line bg-raised/92 p-1.5 backdrop-blur-2xl"
+      className="fixed z-150 rounded-xl border border-line bg-raised/95 p-1.5 backdrop-blur-2xl"
       style={{ left, top, width: MENU_WIDTH, boxShadow: PANEL_SHADOW, transformOrigin: 'top left' }}
       initial={{ opacity: 0, scale: 0.96, y: -4 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -119,7 +138,7 @@ function ContextMenuPanel({ anchor, onClose }: { anchor: ContextMenuAnchor; onCl
             <motion.div
               role="menu"
               aria-label="View"
-              className="absolute top-0 left-full ml-1.5 w-[176px] rounded-xl border border-line bg-raised/94 p-1.5 backdrop-blur-2xl"
+              className="absolute top-0 left-full ml-1.5 w-[176px] rounded-xl border border-line bg-raised/96 p-1.5 backdrop-blur-2xl"
               style={{ boxShadow: PANEL_SHADOW, transformOrigin: 'top left' }}
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
@@ -184,6 +203,80 @@ function ContextMenuPanel({ anchor, onClose }: { anchor: ContextMenuAnchor; onCl
 
       <MenuDivider />
 
+      {/* Theme & Personalization */}
+      <div
+        className="relative"
+        onPointerEnter={() => setThemeOpen(true)}
+        onPointerLeave={() => setThemeOpen(false)}
+      >
+        <button
+          type="button"
+          role="menuitem"
+          aria-haspopup="menu"
+          aria-expanded={themeOpen}
+          className={cn(ITEM, themeOpen && 'bg-white/8')}
+          onClick={() => setThemeOpen((open) => !open)}
+          onFocus={() => setThemeOpen(true)}
+        >
+          <Palette size={13} strokeWidth={1.7} className="text-amber-400" />
+          <span className="flex-1">Theme & Accents</span>
+          <ChevronRight size={13} strokeWidth={1.7} className="text-faint" />
+        </button>
+
+        <AnimatePresence>
+          {themeOpen ? (
+            <motion.div
+              role="menu"
+              aria-label="Theme accents"
+              className="absolute top-0 left-full ml-1.5 w-[210px] rounded-xl border border-line bg-raised/96 p-1.5 backdrop-blur-2xl"
+              style={{ boxShadow: PANEL_SHADOW, transformOrigin: 'top left' }}
+              initial={{ opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -4 }}
+              transition={{ duration: 0.12 }}
+            >
+              {Object.values(THEME_PRESETS).slice(0, 6).map((preset) => {
+                const isSelected = activeThemeId === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={isSelected}
+                    className={ITEM}
+                    onClick={chooseTheme(preset.id)}
+                  >
+                    <span
+                      className="size-3 rounded-full shrink-0 shadow-sm"
+                      style={{ backgroundColor: preset.accent }}
+                    />
+                    <span className="flex-1 text-[12px] truncate">{preset.name}</span>
+                    {isSelected ? (
+                      <Check size={11} strokeWidth={2.5} style={{ color: preset.accent }} />
+                    ) : null}
+                  </button>
+                );
+              })}
+
+              <MenuDivider />
+
+              <button
+                type="button"
+                role="menuitem"
+                className={ITEM}
+                onClick={() => {
+                  close();
+                  onOpenPersonalize();
+                }}
+              >
+                <Sparkles size={12} strokeWidth={2} className="text-cyan-400" />
+                <span className="flex-1 text-[12px]">All Theme Options…</span>
+              </button>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
+
       <button
         type="button"
         role="menuitem"
@@ -198,16 +291,28 @@ function ContextMenuPanel({ anchor, onClose }: { anchor: ContextMenuAnchor; onCl
 }
 
 /**
- * The desktop's right-click menu.
- *
- * Four operations that actually do something — refresh, icon density, restore
- * arrangement, system information. No decorative entries: a menu full of
- * disabled items is a Windows impression, not a working system.
+ * The desktop's right-click menu with Themes & Personalization.
  */
 export function DesktopContextMenu({ anchor, onClose }: DesktopContextMenuProps) {
+  const [personalizeModalOpen, setPersonalizeModalOpen] = useState(false);
+
   return (
-    <AnimatePresence>
-      {anchor ? <ContextMenuPanel key="context-menu" anchor={anchor} onClose={onClose} /> : null}
-    </AnimatePresence>
+    <>
+      <AnimatePresence>
+        {anchor ? (
+          <ContextMenuPanel
+            key="context-menu"
+            anchor={anchor}
+            onClose={onClose}
+            onOpenPersonalize={() => setPersonalizeModalOpen(true)}
+          />
+        ) : null}
+      </AnimatePresence>
+
+      <PersonalizationModal
+        open={personalizeModalOpen}
+        onClose={() => setPersonalizeModalOpen(false)}
+      />
+    </>
   );
 }

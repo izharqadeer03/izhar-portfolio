@@ -9,6 +9,7 @@ import type { Ref } from 'react';
 import { AppGlyph, getAccentValue } from '@/components/applications/AppIcon';
 import { Clock } from '@/components/system/Clock';
 import { WindowsLogo } from '@/components/system/OSLogos';
+import { SystemArea } from '@/components/system/SystemArea';
 import { describeShellAction, useShellItems } from '@/hooks/useShellItems';
 import { TASKBAR_HEIGHT } from '@/lib/constants';
 import { useSystemStore } from '@/lib/store/system-store';
@@ -61,14 +62,14 @@ export function WindowsTaskbar({
           aria-label={`${OS_META.name} Start`}
           data-tip="Start"
           className={cn(
-            'os-tip grid size-9 place-items-center rounded-md transition-colors duration-150 ease-env',
+            'os-tip grid size-9.5 place-items-center rounded-lg transition-all duration-150 ease-env',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
             isLauncherOpen
-              ? 'env-accent-quiet env-accent'
-              : 'text-fg/80 hover:bg-white/10 hover:text-fg',
+              ? 'border border-white/20 bg-white/[0.15] text-accent shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
+              : 'border border-transparent text-fg/90 hover:border-white/10 hover:bg-white/[0.08] hover:text-fg',
           )}
         >
-          <WindowsLogo size={17} />
+          <WindowsLogo size={18} />
         </button>
 
         <button
@@ -76,60 +77,71 @@ export function WindowsTaskbar({
           onClick={onToggleLauncher}
           aria-label="Search applications"
           data-tip="Search"
-          className="os-tip grid size-9 place-items-center rounded-md text-fg/70 transition-colors duration-150 hover:bg-white/10 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="os-tip grid size-9.5 place-items-center rounded-lg border border-transparent text-fg/80 transition-all duration-150 hover:border-white/10 hover:bg-white/[0.08] hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
-          <Search size={16} strokeWidth={1.7} />
+          <Search size={17} strokeWidth={1.8} />
         </button>
 
         <span className="mx-1 h-6 w-px bg-line" role="presentation" />
 
-        {items.map((item) => (
-          <button
-            key={item.application.id}
-            type="button"
-            onClick={() =>
-              item.instance ? toggleMinimize(item.instance.id) : openWindow(item.application.id)
-            }
-            aria-label={describeShellAction(item)}
-            aria-current={item.isActive}
-            data-tip={item.application.title}
-            className={cn(
-              'os-tip relative grid size-9 place-items-center rounded-md transition-colors duration-150 ease-env',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
-              item.isActive ? 'bg-white/[0.11]' : 'hover:bg-white/[0.08]',
-              item.isMinimized && 'opacity-70',
-            )}
-          >
-            <span
-              className="flex"
-              style={{
-                color: getAccentValue(item.application.accent),
-                opacity: item.isRunning ? 1 : 0.72,
-              }}
-            >
-              <AppGlyph icon={item.application.icon} size={16} />
-            </span>
-
-            {/* Running indicator: a short rule that widens when focused. */}
-            <motion.span
-              aria-hidden="true"
+        {items.map((item) => {
+          const accentVal = getAccentValue(item.application.accent);
+          return (
+            <button
+              key={item.application.id}
+              type="button"
+              onClick={() =>
+                item.instance ? toggleMinimize(item.instance.id) : openWindow(item.application.id)
+              }
+              aria-label={describeShellAction(item)}
+              aria-current={item.isActive}
+              data-tip={item.application.title}
               className={cn(
-                'absolute bottom-0.5 h-[2.5px] rounded-full',
-                item.isActive ? 'env-accent-bg' : 'bg-fg/45',
+                'os-tip relative grid size-9.5 place-items-center rounded-lg transition-all duration-150 ease-env',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
+                item.isActive
+                  ? 'border border-white/20 bg-white/[0.15] shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_2px_8px_rgba(0,0,0,0.35)] backdrop-blur-sm'
+                  : 'border border-transparent hover:border-white/10 hover:bg-white/[0.08]',
+                item.isMinimized && 'opacity-65',
               )}
-              initial={false}
-              animate={{
-                width: item.isRunning ? (item.isActive ? 16 : 6) : 0,
-                opacity: item.isRunning ? 1 : 0,
-              }}
-              transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-            />
-          </button>
-        ))}
+            >
+              <span
+                className="flex items-center justify-center transition-transform duration-150 group-hover:scale-110"
+                style={{
+                  color: accentVal,
+                  filter: item.isActive
+                    ? `drop-shadow(0 0 6px ${accentVal}90)`
+                    : 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))',
+                }}
+              >
+                <AppGlyph icon={item.application.icon} size={18} strokeWidth={1.8} />
+              </span>
+
+              {/* Running indicator: a glowing accent pill when active, clean dot when running. */}
+              <motion.span
+                aria-hidden="true"
+                className={cn(
+                  'absolute bottom-0.5 h-[3px] rounded-full transition-colors',
+                  item.isActive ? 'env-accent-bg shadow-[0_0_8px_var(--env-accent)]' : 'bg-white/70',
+                )}
+                initial={false}
+                animate={{
+                  width: item.isRunning ? (item.isActive ? 16 : 6) : 0,
+                  opacity: item.isRunning ? 1 : 0,
+                }}
+                transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
+              />
+            </button>
+          );
+        })}
       </div>
 
       {/* Tray. */}
-      <div className="ms-auto flex items-center gap-1">
+      <div className="ms-auto flex items-center gap-1.5">
+        <SystemArea tone="bar" placement="top" />
+
+        <span className="mx-0.5 h-4 w-px bg-line" role="presentation" />
+
         <span
           className="grid size-8 place-items-center rounded-md text-muted"
           aria-hidden="true"

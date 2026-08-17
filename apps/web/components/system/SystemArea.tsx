@@ -12,17 +12,19 @@ interface SystemAreaProps {
   /** `bar` sits inside a menu bar or panel; `floating` sits on the desktop. */
   tone?: 'floating' | 'bar';
   className?: string;
+  placement?: 'top' | 'bottom';
 }
 
 /**
- * The top-right system area: availability, workspace, and — where the
+ * The system area: availability, workspace, and — where the
  * environment has no other clock — the time.
- *
- * Every environment puts this in the same corner, because the one thing that
- * must not move between environments is the control that moves between
- * environments. Only its dress changes.
  */
-export function SystemArea({ showClock = false, tone = 'floating', className }: SystemAreaProps) {
+export function SystemArea({
+  showClock = false,
+  tone = 'floating',
+  className,
+  placement = 'bottom',
+}: SystemAreaProps) {
   const { status } = SYSTEM_PROFILE;
 
   return (
@@ -51,7 +53,7 @@ export function SystemArea({ showClock = false, tone = 'floating', className }: 
         role="presentation"
       />
 
-      <EnvironmentSwitcher tone={tone === 'floating' ? 'floating' : 'bar'} />
+      <EnvironmentSwitcher tone={tone === 'floating' ? 'floating' : 'bar'} placement={placement} />
 
       {showClock ? (
         <>

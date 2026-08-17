@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { OSMark } from '@/components/system/OSMark';
 import { useDeviceCapability } from '@/hooks/useDeviceCapability';
 import { useSystemStore } from '@/lib/store/system-store';
+import { DEFAULT_THEME_ID, THEME_PRESETS, useThemeStore } from '@/lib/store/theme-store';
 import { formatUptime } from '@/lib/utils';
 
 const RENDERER_LABEL: Record<string, string> = {
@@ -32,6 +33,9 @@ interface SessionInfo {
 export function SystemInformationApp() {
   const { budget, resolved } = useDeviceCapability();
   const readyAt = useSystemStore((state) => state.readyAt);
+  const themeId = useThemeStore((state) => state.themeId);
+  const setTheme = useThemeStore((state) => state.setTheme);
+  const currentPreset = THEME_PRESETS[themeId] ?? THEME_PRESETS[DEFAULT_THEME_ID]!;
 
   const [session, setSession] = useState<SessionInfo | null>(null);
   const [uptime, setUptime] = useState('—');
@@ -122,6 +126,53 @@ export function SystemInformationApp() {
           {PLATFORM_ENTRIES.map((entry) => (
             <DataRow key={entry.label} label={entry.label} value={entry.value} />
           ))}
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* Personalization & Theme */}
+      <section className="px-6 py-5">
+        <div className="flex items-center justify-between">
+          <SectionLabel>Personalization & Themes</SectionLabel>
+          <span
+            className="font-mono text-[10.5px] font-medium px-2 py-0.5 rounded-full border border-line"
+            style={{ color: currentPreset.accent }}
+          >
+            {currentPreset.name}
+          </span>
+        </div>
+
+        <p className="mt-1 text-[12px] text-muted">
+          Active accent color applied across taskbar, windows, 3D constellation, and atmosphere.
+        </p>
+
+        <div className="mt-3.5 grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {Object.values(THEME_PRESETS).map((preset) => {
+            const isSelected = themeId === preset.id;
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => setTheme(preset.id)}
+                className={`flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all ${
+                  isSelected
+                    ? 'border-white/30 bg-white/10 shadow-sm ring-1 ring-white/20'
+                    : 'border-line bg-white/[0.025] hover:bg-white/[0.06]'
+                }`}
+              >
+                <span
+                  className="size-5 rounded-full shrink-0 flex items-center justify-center shadow-inner"
+                  style={{ backgroundColor: preset.accent }}
+                >
+                  {isSelected ? <Check size={11} strokeWidth={3} className="text-black" /> : null}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11.5px] font-medium text-fg truncate">{preset.name}</p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </section>
 

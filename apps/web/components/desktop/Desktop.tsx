@@ -19,6 +19,7 @@ import { useChromeInsets, useEnvironment, useEnvironmentDefinition } from '@/hoo
 import { useHasFinePointer } from '@/hooks/useSystemPreferences';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useSystemStore } from '@/lib/store/system-store';
+import { useThemeStore, THEME_PRESETS, DEFAULT_THEME_ID } from '@/lib/store/theme-store';
 import { useToastStore } from '@/lib/store/toast-store';
 
 /**
@@ -36,6 +37,10 @@ export function Desktop() {
   const definition = useEnvironmentDefinition();
   const insets = useChromeInsets();
   const hasFinePointer = useHasFinePointer();
+
+  const themeId = useThemeStore((state) => state.themeId);
+  const themePreset = THEME_PRESETS[themeId] ?? THEME_PRESETS[DEFAULT_THEME_ID]!;
+  const activeAccent = environment === 'windows' ? themePreset.accent : definition.accent;
 
   const selectIcon = useSystemStore((state) => state.selectIcon);
 
@@ -129,7 +134,7 @@ export function Desktop() {
       className="relative h-dvh w-full overflow-hidden bg-void"
       data-environment={environment}
       // The active environment's accent, published once for the whole tree.
-      style={{ '--env-accent': definition.accent } as React.CSSProperties}
+      style={{ '--env-accent': activeAccent } as React.CSSProperties}
     >
       <DesktopBackground />
       <CursorAccent />

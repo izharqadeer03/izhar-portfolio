@@ -4,7 +4,6 @@ import type { RefObject } from 'react';
 
 import { WindowsStartMenu } from '@/components/environments/windows/WindowsStartMenu';
 import { WindowsTaskbar } from '@/components/environments/windows/WindowsTaskbar';
-import { SystemArea } from '@/components/system/SystemArea';
 
 interface WindowsShellProps {
   isLauncherOpen: boolean;
@@ -29,10 +28,6 @@ export function WindowsShell({
 }: WindowsShellProps) {
   return (
     <>
-      <div className="absolute top-4 right-4 z-130">
-        <SystemArea tone="floating" />
-      </div>
-
       <WindowsTaskbar
         isLauncherOpen={isLauncherOpen}
         onToggleLauncher={onToggleLauncher}

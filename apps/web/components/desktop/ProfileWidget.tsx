@@ -56,12 +56,12 @@ export function ProfileWidget() {
       key={environment}
       aria-label="Profile"
       className={cn(
-        'absolute z-10 hidden w-[212px] select-none p-3.5 lg:block',
+        'absolute z-10 hidden w-[285px] select-none p-4.5 lg:block',
         placement.position,
         placement.surface,
         placement.radius,
       )}
-      style={{ boxShadow: '0 22px 50px -22px rgba(0,0,0,0.85)' }}
+      style={{ boxShadow: '0 24px 54px -20px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.08)' }}
       initial={{
         opacity: 0,
         y: reducedMotion ? 0 : motionSpec.rise,
@@ -74,36 +74,41 @@ export function ProfileWidget() {
         ease: motionSpec.ease,
       }}
     >
-      <p className="text-[12.5px] font-semibold tracking-tight text-fg">{SYSTEM_PROFILE.name}</p>
-      <p className="mt-0.5 text-[11.5px] text-muted">{SYSTEM_PROFILE.role}</p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-[13.5px] font-semibold tracking-tight text-fg">{SYSTEM_PROFILE.name}</p>
+          <p className="mt-0.5 text-[11.5px] text-muted">{SYSTEM_PROFILE.role}</p>
+        </div>
+      </div>
 
-      <div className="mt-3 h-px bg-line" role="presentation" />
+      <div className="mt-3.5 h-px bg-line" role="presentation" />
 
-      <dl className="mt-3 space-y-1.5">
+      <dl className="mt-3.5 space-y-2">
         <div className="flex items-baseline justify-between gap-3">
-          <dt className="text-[11px] text-faint">Experience</dt>
-          <dd className="font-mono text-[11.5px] text-fg/85">{SYSTEM_PROFILE.experience}</dd>
+          <dt className="text-[11.5px] text-muted">Experience</dt>
+          <dd className="font-mono text-[11.5px] font-medium text-fg/90 whitespace-nowrap">{SYSTEM_PROFILE.experience}</dd>
         </div>
         <div className="flex items-baseline justify-between gap-3">
-          <dt className="text-[11px] text-faint">Location</dt>
-          <dd className="font-mono text-[11.5px] text-fg/85">{SYSTEM_PROFILE.location}</dd>
+          <dt className="text-[11.5px] text-muted">Location</dt>
+          <dd className="font-mono text-[11.5px] text-fg/90">{SYSTEM_PROFILE.location}</dd>
         </div>
       </dl>
 
-      <div className="mt-3 flex flex-wrap gap-1">
+      <div className="mt-3.5 flex flex-wrap gap-1.5">
         {SYSTEM_PROFILE.disciplines.map((discipline) => (
           <span
             key={discipline}
-            className="rounded border border-line bg-white/[0.035] px-1.5 py-0.5 text-[10.5px] text-muted"
+            className="rounded-md border border-line bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-muted/90"
           >
             {discipline}
           </span>
         ))}
       </div>
 
-      <div className="mt-3 flex items-center gap-2 border-t border-line pt-3">
+      <div className="mt-3.5 flex items-center gap-2 border-t border-line pt-3">
         <StatusDot state={SYSTEM_PROFILE.status.state} />
-        <span className="text-[11px] font-medium text-fg/85">{SYSTEM_PROFILE.status.label}</span>
+        <span className="text-[11.5px] font-medium text-fg/90">{SYSTEM_PROFILE.status.label}</span>
+        <span className="text-[11px] text-muted ml-auto truncate max-w-[130px]">for opportunities</span>
       </div>
     </motion.aside>
   );
