@@ -7,7 +7,7 @@ import type { OperatingSystemMeta, PlatformEntry, SystemProfile } from '@izhar-o
  */
 export const OS_META: OperatingSystemMeta = {
   name: 'IZHAR OS',
-  shortName: 'IZ',
+  shortName: 'IQ',
   version: '2.0.0',
   channel: 'Phase 4 — Production',
   description: 'Personal Developer Workspace',

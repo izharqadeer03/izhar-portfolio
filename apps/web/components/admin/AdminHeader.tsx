@@ -28,7 +28,7 @@ export function AdminHeader({
       <div className="flex items-center gap-3">
         <a href="/" className="flex items-center gap-2 text-fg hover:opacity-80 transition-opacity">
           <div className="size-8 rounded-lg border border-rose-500/40 bg-rose-500/10 grid place-items-center text-rose-400 font-mono font-bold text-xs">
-            IZ
+            IQ
           </div>
           <div>
             <h1 className="text-[14px] font-bold tracking-tight text-fg leading-none">

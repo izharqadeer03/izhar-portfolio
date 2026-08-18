@@ -331,7 +331,7 @@ export function AdminProjectsTab({
               </button>
             </div>
 
-            <form onSubmit={handleSaveModal} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2 os-scroll">
+            <form onSubmit={handleSaveModal} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2 admin-scroll">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[11.5px] font-semibold text-faint uppercase">Project Name</label>

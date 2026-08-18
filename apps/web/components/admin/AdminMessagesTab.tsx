@@ -228,7 +228,7 @@ export function AdminMessagesTab({
             </div>
 
             {/* Full Message Body */}
-            <div className="rounded-xl border border-line/60 bg-void/60 p-4 text-[13px] text-fg/90 leading-relaxed max-h-[300px] overflow-y-auto os-scroll whitespace-pre-wrap">
+            <div className="rounded-xl border border-line/60 bg-void/60 p-4 text-[13px] text-fg/90 leading-relaxed max-h-[300px] overflow-y-auto admin-scroll whitespace-pre-wrap">
               {selectedMessage.message}
             </div>
 

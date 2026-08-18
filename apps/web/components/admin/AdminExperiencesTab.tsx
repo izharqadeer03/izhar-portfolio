@@ -215,7 +215,7 @@ export function AdminExperiencesTab({
               </button>
             </div>
 
-            <form onSubmit={handleSaveModal} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1 os-scroll">
+            <form onSubmit={handleSaveModal} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1 admin-scroll">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-faint uppercase">Job Title / Role</label>

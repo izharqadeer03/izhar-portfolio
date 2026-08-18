@@ -27,6 +27,7 @@ interface AdminSidebarProps {
   activeTab: AdminTab;
   onTabChange: (tab: AdminTab) => void;
   unreadCount?: number;
+  onWheel?: (e: React.WheelEvent<HTMLElement>) => void;
 }
 
 interface AdminNavItem {
@@ -41,6 +42,7 @@ export function AdminSidebar({
   activeTab,
   onTabChange,
   unreadCount = 0,
+  onWheel,
 }: AdminSidebarProps) {
   const navItems: AdminNavItem[] = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -59,7 +61,10 @@ export function AdminSidebar({
   ];
 
   return (
-    <aside className="w-full md:w-60 lg:w-64 shrink-0 border-r border-line bg-[#090c12]/60 p-3 space-y-1 overflow-x-auto md:overflow-y-auto os-scroll">
+    <aside
+      onWheel={onWheel}
+      className="w-full md:w-60 lg:w-64 shrink-0 border-r border-line bg-[#090c12]/60 p-3 space-y-1 overflow-x-auto md:overflow-y-auto admin-scroll"
+    >
       <div className="hidden md:block px-3 py-2 text-[10.5px] font-mono tracking-[0.14em] text-faint uppercase">
         Management Areas
       </div>

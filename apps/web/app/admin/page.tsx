@@ -29,12 +29,19 @@ import { useToastStore } from '@/lib/store/toast-store';
 
 export default function AdminPage() {
   const addToast = useToastStore((state) => state.addToast);
+  const mainRef = React.useRef<HTMLElement>(null);
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [isSyncing, setIsSyncing] = useState(false);
   const [dbConnected, setDbConnected] = useState(true);
   const [latencyMs, setLatencyMs] = useState(30);
+
+  const handleSidebarWheel = (e: React.WheelEvent<HTMLElement>) => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop += e.deltaY;
+    }
+  };
 
   // Portfolio Entities State
   const [profile, setProfile] = useState<SystemProfile | null>(null);
@@ -378,11 +385,16 @@ export default function AdminPage() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           unreadCount={unreadMessagesCount}
+          onWheel={handleSidebarWheel}
         />
 
         {/* Tab Content Area */}
-        <main className="os-scroll flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto min-h-0 w-full">
-          <div className="max-w-7xl mx-auto pb-12">
+        <main
+          ref={mainRef}
+          tabIndex={0}
+          className="admin-scroll flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto overscroll-contain min-h-0 w-full outline-none focus:outline-none focus-visible:outline-none select-text"
+        >
+          <div className="max-w-7xl mx-auto pb-28">
             {activeTab === 'overview' && profile && about ? (
             <AdminOverviewTab
               skillsCount={skills.length}
