@@ -97,11 +97,12 @@ export function EnvironmentSwitcher({
             role="menu"
             aria-label="Choose your workspace"
             className={cn(
-              'absolute right-0 z-170 w-[268px] rounded-xl border border-line bg-raised/94 p-1.5 backdrop-blur-2xl',
+              'absolute right-0 z-170 w-[268px] rounded-xl border border-white/14 bg-raised/98 p-1.5 backdrop-blur-3xl',
               placement === 'bottom' ? 'top-[calc(100%+8px)]' : 'bottom-[calc(100%+8px)]',
             )}
             style={{
-              boxShadow: '0 26px 60px -18px rgba(0,0,0,0.92), inset 0 1px 0 rgba(255,255,255,0.06)',
+              boxShadow:
+                '0 26px 60px -18px rgba(0,0,0,0.96), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.04)',
               transformOrigin: placement === 'bottom' ? 'top right' : 'bottom right',
             }}
             initial={{ opacity: 0, scale: 0.96, y: placement === 'bottom' ? -6 : 6 }}
@@ -126,7 +127,7 @@ export function EnvironmentSwitcher({
                   onClick={() => choose(environment.id)}
                   className={cn(
                     'flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left',
-                    'transition-colors duration-120 focus-visible:outline-none',
+                    'transition-colors duration-120 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
                     isCurrent
                       ? 'bg-white/[0.08]'
                       : 'hover:bg-white/[0.055] focus-visible:bg-white/[0.055]',

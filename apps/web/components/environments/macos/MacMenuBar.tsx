@@ -271,21 +271,34 @@ export function MacMenuBar({ onOpenLaunchpad }: MacMenuBarProps) {
 
       {/* Status area. */}
       <div className="ms-auto flex items-center gap-1">
-        <span className="grid size-6 place-items-center text-fg/75" aria-hidden="true">
+        <span
+          className="os-tip grid size-6 place-items-center rounded-[5px] text-fg/75 transition-colors hover:bg-white/10 hover:text-fg"
+          aria-label="Battery: 100%"
+          data-tip="Battery: 100% · Power Adapter"
+        >
           <BatteryMedium size={16} strokeWidth={1.5} />
         </span>
-        <span className="grid size-6 place-items-center text-fg/75" aria-hidden="true">
+        <span
+          className="os-tip grid size-6 place-items-center rounded-[5px] text-fg/75 transition-colors hover:bg-white/10 hover:text-fg"
+          aria-label="Wi-Fi"
+          data-tip="Wi-Fi: Connected to IZHAR-Net"
+        >
           <Wifi size={14} strokeWidth={1.7} />
         </span>
         <button
           type="button"
           onClick={onOpenLaunchpad}
           aria-label="Search applications"
-          className="grid size-6 place-items-center rounded-[5px] text-fg/75 transition-colors hover:bg-white/10 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          data-tip="Spotlight Search"
+          className="os-tip grid size-6 place-items-center rounded-[5px] text-fg/75 transition-colors hover:bg-white/10 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <Search size={14} strokeWidth={1.7} />
         </button>
-        <span className="grid size-6 place-items-center text-fg/75" aria-hidden="true">
+        <span
+          className="os-tip grid size-6 place-items-center rounded-[5px] text-fg/75 transition-colors hover:bg-white/10 hover:text-fg"
+          aria-label="Control Centre"
+          data-tip="Control Centre"
+        >
           <SlidersHorizontal size={14} strokeWidth={1.7} />
         </span>
 
@@ -308,9 +321,9 @@ function MenuPanel({ menu, onClose }: { menu: MenuDefinition; onClose: () => voi
     <motion.div
       role="menu"
       aria-label={menu.label}
-      className="mac-vibrancy absolute top-[calc(100%+4px)] left-0 z-160 min-w-[232px] rounded-[10px] border border-line p-1.5"
+      className="mac-vibrancy absolute top-[calc(100%+4px)] left-0 z-160 min-w-[232px] rounded-[10px] border border-white/14 p-1.5"
       style={{
-        boxShadow: '0 26px 60px -18px rgba(0,0,0,0.92)',
+        boxShadow: '0 26px 60px -18px rgba(0,0,0,0.96), inset 0 1px 0 rgba(255,255,255,0.12)',
         transformOrigin: 'top left',
       }}
       initial={{ opacity: 0, scale: 0.97, y: -4 }}

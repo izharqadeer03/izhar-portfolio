@@ -69,7 +69,19 @@ const STYLES: Record<EnvironmentId, IdentityStyle> = {
  * document's only `h1`, and it says the five things that matter: name, role,
  * disciplines, what the work is, and whether the person is available.
  */
-export function DesktopIdentity() {
+interface DesktopIdentityProps {
+  isDimmed?: boolean;
+}
+
+/**
+ * Identity, as part of the desktop rather than as a banner across it.
+ *
+ * A visitor should know whose workspace this is before they open anything, so
+ * this is not decoration and not a watermark — it is real text, it carries the
+ * document's only `h1`, and it says the five things that matter: name, role,
+ * disciplines, what the work is, and whether the person is available.
+ */
+export function DesktopIdentity({ isDimmed = false }: DesktopIdentityProps) {
   const environment = useEnvironment();
   const style = STYLES[environment];
   const motionSpec = useEnvironmentMotion();
@@ -114,14 +126,20 @@ export function DesktopIdentity() {
   });
 
   return (
-    <div
+    <motion.div
       className={cn(
-        'pointer-events-none absolute z-10 flex flex-col select-none',
+        'pointer-events-none absolute z-10 flex flex-col select-none transition-all',
         // On a phone the identity is placed below the icon grid, so its own
         // vertical anchor is dropped.
         isMobile ? 'inset-x-0 items-center px-6 text-center' : style.wrapper,
       )}
       style={clearance}
+      animate={{
+        opacity: isDimmed ? 0.08 : 1,
+        filter: isDimmed ? 'blur(6px)' : 'blur(0px)',
+        scale: isDimmed ? 0.985 : 1,
+      }}
+      transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
     >
       <motion.h1
         key={`${environment}-name`}
@@ -182,6 +200,6 @@ export function DesktopIdentity() {
           {SYSTEM_PROFILE.status.label} for opportunities
         </span>
       </motion.p>
-    </div>
+    </motion.div>
   );
 }

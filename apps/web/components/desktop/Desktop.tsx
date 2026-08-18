@@ -159,7 +159,7 @@ export function Desktop() {
         }}
       >
         <DesktopIcons />
-        <DesktopIdentity />
+        <DesktopIdentity isDimmed={launcherOpen} />
         <ProfileWidget />
       </div>
 

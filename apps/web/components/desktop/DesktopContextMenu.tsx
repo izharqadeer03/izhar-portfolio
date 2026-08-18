@@ -29,7 +29,7 @@ const ITEM =
   'flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-left text-[12.5px] text-fg/90 ' +
   'transition-colors duration-100 hover:bg-white/8 focus-visible:bg-white/8 focus-visible:outline-none';
 
-const PANEL_SHADOW = '0 24px 56px -18px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.06)';
+const PANEL_SHADOW = '0 24px 56px -18px rgba(0,0,0,0.96), inset 0 1px 0 rgba(255,255,255,0.12)';
 
 function MenuDivider() {
   return (
@@ -99,7 +99,7 @@ function ContextMenuPanel({
       ref={menuRef}
       role="menu"
       aria-label="Desktop options"
-      className="fixed z-150 rounded-xl border border-line bg-raised/95 p-1.5 backdrop-blur-2xl"
+      className="fixed z-150 rounded-xl border border-white/14 bg-raised/98 p-1.5 backdrop-blur-3xl"
       style={{ left, top, width: MENU_WIDTH, boxShadow: PANEL_SHADOW, transformOrigin: 'top left' }}
       initial={{ opacity: 0, scale: 0.96, y: -4 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -138,7 +138,7 @@ function ContextMenuPanel({
             <motion.div
               role="menu"
               aria-label="View"
-              className="absolute top-0 left-full ml-1.5 w-[176px] rounded-xl border border-line bg-raised/96 p-1.5 backdrop-blur-2xl"
+              className="absolute top-0 left-full ml-1.5 w-[176px] rounded-xl border border-white/14 bg-raised/98 p-1.5 backdrop-blur-3xl"
               style={{ boxShadow: PANEL_SHADOW, transformOrigin: 'top left' }}
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}

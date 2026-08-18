@@ -132,8 +132,11 @@ export function UbuntuTopBar({ isActivitiesOpen, onToggleActivities }: UbuntuTop
                 ref={menuRef}
                 role="menu"
                 aria-label="System menu"
-                className="yaru-surface absolute top-[calc(100%+6px)] right-0 z-160 w-[224px] rounded-xl border border-black/45 p-2"
-                style={{ boxShadow: '0 24px 56px -18px rgba(0,0,0,0.9)' }}
+                className="yaru-surface absolute top-[calc(100%+6px)] right-0 z-160 w-[224px] rounded-xl border border-white/12 p-2"
+                style={{
+                  boxShadow:
+                    '0 24px 56px -18px rgba(0,0,0,0.96), inset 0 1px 0 rgba(255,255,255,0.08)',
+                }}
                 initial={{ opacity: 0, y: -6, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -4, scale: 0.98 }}
@@ -144,7 +147,7 @@ export function UbuntuTopBar({ isActivitiesOpen, onToggleActivities }: UbuntuTop
                   role="menuitemcheckbox"
                   aria-checked={soundEnabled}
                   onClick={toggleSound}
-                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[12.5px] text-fg/90 transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:bg-white/10"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[12.5px] text-fg/90 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   {soundEnabled ? (
                     <Volume2 size={14} strokeWidth={1.7} />
@@ -167,7 +170,7 @@ export function UbuntuTopBar({ isActivitiesOpen, onToggleActivities }: UbuntuTop
                   disabled={windows.length === 0}
                   className={cn(
                     'flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[12.5px] transition-colors',
-                    'focus-visible:outline-none focus-visible:bg-white/10',
+                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
                     windows.length === 0
                       ? 'cursor-default text-faint/70'
                       : 'text-fg/90 hover:bg-white/10',

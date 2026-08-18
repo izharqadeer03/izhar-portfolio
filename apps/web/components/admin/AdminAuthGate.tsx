@@ -45,7 +45,7 @@ export function AdminAuthGate({ onAuthenticated }: AdminAuthGateProps) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#080a0f] text-fg flex items-center justify-center p-4 relative overflow-hidden font-sans">
+    <div className="h-screen h-dvh w-full bg-[#080a0f] text-fg flex items-center justify-center p-4 relative overflow-y-auto os-scroll font-sans">
       {/* Background ambient lighting */}
       <div
         aria-hidden="true"

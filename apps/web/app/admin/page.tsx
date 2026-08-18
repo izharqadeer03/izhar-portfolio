@@ -361,7 +361,7 @@ export default function AdminPage() {
   const unreadMessagesCount = messages.filter((m) => m.status === 'unread').length;
 
   return (
-    <div className="min-h-screen bg-[#080a0f] text-fg flex flex-col font-sans selection:bg-rose-500/30 selection:text-white">
+    <div className="h-screen h-dvh w-full bg-[#080a0f] text-fg flex flex-col font-sans selection:bg-rose-500/30 selection:text-white overflow-hidden">
       {/* Top Header */}
       <AdminHeader
         dbConnected={dbConnected}
@@ -372,7 +372,7 @@ export default function AdminPage() {
       />
 
       {/* Main Container */}
-      <div className="flex-1 flex flex-col md:flex-row min-h-0">
+      <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
         {/* Sidebar Navigation */}
         <AdminSidebar
           activeTab={activeTab}
@@ -381,8 +381,9 @@ export default function AdminPage() {
         />
 
         {/* Tab Content Area */}
-        <main className="os-scroll flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl">
-          {activeTab === 'overview' && profile && about ? (
+        <main className="os-scroll flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto min-h-0 w-full">
+          <div className="max-w-7xl mx-auto pb-12">
+            {activeTab === 'overview' && profile && about ? (
             <AdminOverviewTab
               skillsCount={skills.length}
               projectsCount={projects.length}
@@ -465,6 +466,7 @@ export default function AdminPage() {
               }}
             />
           ) : null}
+          </div>
         </main>
       </div>
     </div>

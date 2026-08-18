@@ -169,8 +169,8 @@ export function AdminMessagesTab({
 
       {/* Message Reader Modal */}
       {selectedMessage ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl border border-line bg-[#0e1218] p-6 shadow-2xl space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
+          <div className="w-full max-w-lg my-8 rounded-2xl border border-line bg-[#0e1218] p-6 shadow-2xl space-y-5">
             {/* Modal Header */}
             <div className="flex items-start justify-between gap-3 border-b border-line pb-4">
               <div>
@@ -228,7 +228,7 @@ export function AdminMessagesTab({
             </div>
 
             {/* Full Message Body */}
-            <div className="rounded-xl border border-line/60 bg-void/60 p-4 text-[13px] text-fg/90 leading-relaxed max-h-[300px] overflow-y-auto whitespace-pre-wrap">
+            <div className="rounded-xl border border-line/60 bg-void/60 p-4 text-[13px] text-fg/90 leading-relaxed max-h-[300px] overflow-y-auto os-scroll whitespace-pre-wrap">
               {selectedMessage.message}
             </div>
 

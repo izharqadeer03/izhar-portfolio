@@ -77,7 +77,13 @@ export function WindowsTaskbar({
           onClick={onToggleLauncher}
           aria-label="Search applications"
           data-tip="Search"
-          className="os-tip grid size-9.5 place-items-center rounded-lg border border-transparent text-fg/80 transition-all duration-150 hover:border-white/10 hover:bg-white/[0.08] hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className={cn(
+            'os-tip grid size-9.5 place-items-center rounded-lg transition-all duration-150 ease-env',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70',
+            isLauncherOpen
+              ? 'border border-white/20 bg-white/[0.12] text-accent'
+              : 'border border-transparent text-fg/80 hover:border-white/10 hover:bg-white/[0.08] hover:text-fg',
+          )}
         >
           <Search size={17} strokeWidth={1.8} />
         </button>
@@ -142,13 +148,14 @@ export function WindowsTaskbar({
 
         <span className="mx-0.5 h-4 w-px bg-line" role="presentation" />
 
-        <span
-          className="grid size-8 place-items-center rounded-md text-muted"
-          aria-hidden="true"
-          title="Network"
+        <button
+          type="button"
+          aria-label="Internet access"
+          data-tip="Internet access · Connected"
+          className="os-tip grid size-8 place-items-center rounded-md text-muted transition-colors duration-150 hover:bg-white/8 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <Wifi size={15} strokeWidth={1.6} />
-        </span>
+        </button>
 
         <button
           type="button"

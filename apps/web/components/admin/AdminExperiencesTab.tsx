@@ -200,8 +200,8 @@ export function AdminExperiencesTab({
 
       {/* Experience Editor Modal */}
       {editingExp ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-2xl border border-line bg-[#0e1218] p-6 shadow-2xl space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
+          <div className="w-full max-w-2xl my-8 rounded-2xl border border-line bg-[#0e1218] p-6 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b border-line pb-3">
               <h3 className="text-[16px] font-bold text-white">
                 {isNew ? 'Add Experience' : `Edit: ${editingExp.role} @ ${editingExp.company}`}
@@ -215,7 +215,7 @@ export function AdminExperiencesTab({
               </button>
             </div>
 
-            <form onSubmit={handleSaveModal} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+            <form onSubmit={handleSaveModal} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1 os-scroll">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-faint uppercase">Job Title / Role</label>
