@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  PROJECT_CATEGORIES,
-  getProjectById,
-  searchProjects,
-} from '@izhar-os/config';
 import type { Project } from '@izhar-os/types';
-import { SYSTEM_PROFILE } from '@izhar-os/config';
 import { useCallback, useMemo, useState, type MouseEvent } from 'react';
 
 import { ProjectDetailView } from '@/components/applications/projects/ProjectDetailView';
@@ -26,6 +20,7 @@ import {
 } from '@/components/applications/projects/ProjectsToolbar';
 import { useEnvironment } from '@/hooks/useEnvironment';
 import { useHasFinePointer } from '@/hooks/useSystemPreferences';
+import { usePortfolioStore } from '@/lib/store/portfolio-store';
 import { useWindowStore } from '@/lib/store/window-store';
 
 interface Location {
@@ -39,6 +34,10 @@ export function ProjectsApp() {
   const environment = useEnvironment();
   const hasFinePointer = useHasFinePointer();
   const openWindow = useWindowStore((state) => state.openWindow);
+
+  const projects = usePortfolioStore((state) => state.projects);
+  const projectCategories = usePortfolioStore((state) => state.projectCategories);
+  const profile = usePortfolioStore((state) => state.profile);
 
   // History stack navigation
   const [nav, setNav] = useState<{ stack: Location[]; cursor: number }>({
@@ -85,11 +84,23 @@ export function ProjectsApp() {
 
   // Filter & sort projects
   const activeCategory = useMemo(() => {
-    return PROJECT_CATEGORIES.find((c) => c.id === location.category);
-  }, [location.category]);
+    return projectCategories.find((c) => c.id === location.category);
+  }, [projectCategories, location.category]);
 
   const filteredProjects = useMemo(() => {
-    let list = searchProjects(query, location.category);
+    let list = projects.filter((p) => {
+      if (location.category === 'featured') return p.featured;
+      if (location.category !== 'all' && p.category !== location.category) return false;
+      if (query.trim()) {
+        const q = query.toLowerCase();
+        return (
+          p.name.toLowerCase().includes(q) ||
+          p.shortDescription.toLowerCase().includes(q) ||
+          p.technologies.some((t) => t.toLowerCase().includes(q))
+        );
+      }
+      return true;
+    });
 
     if (sort === 'name') {
       list = [...list].sort((a, b) => a.name.localeCompare(b.name));
@@ -100,11 +111,11 @@ export function ProjectsApp() {
     }
 
     return list;
-  }, [location.category, query, sort]);
+  }, [projects, location.category, query, sort]);
 
   const activeProject = useMemo(() => {
-    return location.projectId ? getProjectById(location.projectId) : null;
-  }, [location.projectId]);
+    return location.projectId ? projects.find((p) => p.id === location.projectId) ?? null : null;
+  }, [projects, location.projectId]);
 
   // Breadcrumbs path segments
   const segments = useMemo(() => {
@@ -143,11 +154,11 @@ export function ProjectsApp() {
     (target: ContextMenuTarget) => {
       openWindow('projects');
       if (target.type === 'project') {
-        const p = getProjectById(target.id);
+        const p = projects.find((proj) => proj.id === target.id);
         if (p) handleOpenProject(p);
       }
     },
-    [handleOpenProject, openWindow],
+    [projects, handleOpenProject, openWindow],
   );
 
   const handleCopyName = useCallback((name: string) => {
@@ -186,7 +197,7 @@ export function ProjectsApp() {
       {/* Main Body */}
       <div className="flex min-h-0 flex-1">
         <ProjectsSidebar
-          categories={PROJECT_CATEGORIES}
+          categories={projectCategories}
           environment={environment}
           currentCategory={location.category}
           onSelectCategory={(catId) => navigate({ category: catId, projectId: null })}
@@ -200,7 +211,7 @@ export function ProjectsApp() {
             />
           ) : view === 'grid' ? (
             <ProjectsGrid
-              categories={PROJECT_CATEGORIES}
+              categories={projectCategories}
               projects={filteredProjects}
               environment={environment}
               selectedId={selectedId}
@@ -235,13 +246,13 @@ export function ProjectsApp() {
           onOpen={(t) => {
             if (t.type === 'category') handleOpenCategory(t.id);
             else {
-              const p = getProjectById(t.id);
+              const p = projects.find((x) => x.id === t.id);
               if (p) handleOpenProject(p);
             }
           }}
           onOpenNewWindow={handleOpenNewWindow}
           onViewArchitecture={(t) => {
-            const p = getProjectById(t.id);
+            const p = projects.find((x) => x.id === t.id);
             if (p) handleOpenProject(p);
           }}
           onCopyName={handleCopyName}
@@ -256,7 +267,7 @@ export function ProjectsApp() {
             : `${filteredProjects.length} projects · Explore engineering portfolio`}
         </span>
         <span className="hidden sm:block text-faint">
-          {SYSTEM_PROFILE.name} · {SYSTEM_PROFILE.role}
+          {profile.name} · {profile.role}
         </span>
       </footer>
     </div>

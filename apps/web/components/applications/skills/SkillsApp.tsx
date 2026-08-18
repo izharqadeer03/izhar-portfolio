@@ -1,6 +1,5 @@
 'use client';
 
-import { SKILL_CATEGORIES, SKILLS, SYSTEM_PROFILE } from '@izhar-os/config';
 import type { SkillCategoryId, SkillItem } from '@izhar-os/types';
 import { cn } from '@izhar-os/ui';
 import {
@@ -29,6 +28,7 @@ import {
 import { useApplicationChrome } from '@/hooks/useEnvironment';
 import { useIsNarrow } from '@/hooks/useNarrow';
 import { useIsMobile } from '@/hooks/useSystemPreferences';
+import { usePortfolioStore } from '@/lib/store/portfolio-store';
 
 const NARROW_WIDTH = 680;
 
@@ -37,6 +37,10 @@ export function SkillsApp(_props: ApplicationViewProps) {
   const isMobile = useIsMobile();
   const rootRef = useRef<HTMLDivElement>(null);
   const isNarrow = useIsNarrow(rootRef, NARROW_WIDTH);
+
+  const skills = usePortfolioStore((state) => state.skills);
+  const skillCategories = usePortfolioStore((state) => state.skillCategories);
+  const profile = usePortfolioStore((state) => state.profile);
 
   const [activeCategory, setActiveCategory] = useState<SkillCategoryId | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,7 +53,7 @@ export function SkillsApp(_props: ApplicationViewProps) {
 
   // Filter skills based on category, search query, and competency level
   const filteredSkills = useMemo(() => {
-    return SKILLS.filter((skill) => {
+    return skills.filter((skill) => {
       // Category filter
       if (activeCategory !== 'all' && skill.category !== activeCategory) {
         return false;
@@ -73,12 +77,12 @@ export function SkillsApp(_props: ApplicationViewProps) {
 
       return nameMatch || descMatch || roleMatch || tagsMatch || capMatch || noteMatch;
     });
-  }, [activeCategory, levelFilter, searchQuery]);
+  }, [skills, activeCategory, levelFilter, searchQuery]);
 
   // Group filtered skills by category
   const groupedSkills = useMemo(() => {
     const map = new Map<SkillCategoryId, SkillItem[]>();
-    SKILL_CATEGORIES.forEach((cat) => map.set(cat.id, []));
+    skillCategories.forEach((cat) => map.set(cat.id, []));
 
     filteredSkills.forEach((skill) => {
       const list = map.get(skill.category);
@@ -86,11 +90,13 @@ export function SkillsApp(_props: ApplicationViewProps) {
       else map.set(skill.category, [skill]);
     });
 
-    return SKILL_CATEGORIES.map((cat) => ({
-      category: cat,
-      skills: map.get(cat.id) || [],
-    })).filter((group) => group.skills.length > 0);
-  }, [filteredSkills]);
+    return skillCategories
+      .map((cat) => ({
+        category: cat,
+        skills: map.get(cat.id) || [],
+      }))
+      .filter((group) => group.skills.length > 0);
+  }, [skillCategories, filteredSkills]);
 
   // Keyboard shortcut listener (Esc to close inspector or clear search)
   useEffect(() => {
@@ -216,18 +222,18 @@ export function SkillsApp(_props: ApplicationViewProps) {
       {/* Footer Status Bar */}
       <footer className="flex shrink-0 items-center justify-between border-t border-line bg-surface/30 px-3 py-1.5 text-[11px] text-muted select-none">
         <div className="flex items-center gap-2">
-          <span>{SKILLS.length} Verified Technologies</span>
+          <span>{skills.length} Verified Technologies</span>
           <span>·</span>
           <span className="text-amber-400/90 font-medium">
-            {SKILLS.filter((s) => s.level === 'Core / Advanced').length} Core & Advanced
+            {skills.filter((s) => s.level === 'Core / Advanced').length} Core & Advanced
           </span>
           <span>·</span>
           <span>
-            {SKILLS.filter((s) => s.level === 'Proficient').length} Proficient
+            {skills.filter((s) => s.level === 'Proficient').length} Proficient
           </span>
         </div>
         <span className="hidden sm:block text-faint font-mono">
-          {SYSTEM_PROFILE.name} · {SYSTEM_PROFILE.role} (~3 yrs exp)
+          {profile.name} · {profile.role} ({profile.experience})
         </span>
       </footer>
     </div>

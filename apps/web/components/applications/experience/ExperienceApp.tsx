@@ -1,6 +1,5 @@
 'use client';
 
-import { EXPERIENCES, PROJECTS, SYSTEM_PROFILE } from '@izhar-os/config';
 import type { Project } from '@izhar-os/types';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -12,9 +11,14 @@ import {
   ExperienceToolbar,
   type ExperienceViewMode,
 } from '@/components/applications/experience/ExperienceToolbar';
+import { usePortfolioStore } from '@/lib/store/portfolio-store';
 
 export function ExperienceApp(_props: ApplicationViewProps) {
-  const [selectedId, setSelectedId] = useState<string>(EXPERIENCES[0]?.id ?? '');
+  const experiences = usePortfolioStore((state) => state.experiences);
+  const projects = usePortfolioStore((state) => state.projects);
+  const profile = usePortfolioStore((state) => state.profile);
+
+  const [selectedId, setSelectedId] = useState<string>(experiences[0]?.id ?? '');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTech, setActiveTech] = useState<string>('all');
   const [viewMode, setViewMode] = useState<ExperienceViewMode>('timeline');
@@ -23,14 +27,14 @@ export function ExperienceApp(_props: ApplicationViewProps) {
   // Collect all unique technologies across all experiences and projects
   const allTechnologies = useMemo(() => {
     const set = new Set<string>();
-    EXPERIENCES.forEach((exp) => exp.technologies.forEach((t) => set.add(t)));
-    PROJECTS.forEach((proj) => proj.technologies.forEach((t) => set.add(t)));
+    experiences.forEach((exp) => exp.technologies.forEach((t) => set.add(t)));
+    projects.forEach((proj) => proj.technologies.forEach((t) => set.add(t)));
     return ['all', ...Array.from(set).sort()];
-  }, []);
+  }, [experiences, projects]);
 
   // Filter experiences based on search query and active technology
   const filteredExperiences = useMemo(() => {
-    return EXPERIENCES.filter((exp) => {
+    return experiences.filter((exp) => {
       const matchesTech =
         activeTech === 'all' ||
         exp.technologies.some((t) => t.toLowerCase() === activeTech.toLowerCase()) ||
@@ -48,7 +52,7 @@ export function ExperienceApp(_props: ApplicationViewProps) {
         exp.technologies.some((t) => t.toLowerCase().includes(q))
       );
     });
-  }, [activeTech, searchQuery]);
+  }, [experiences, activeTech, searchQuery]);
 
   // Keyboard shortcut listener (Esc closes project drawer or clears search)
   useEffect(() => {
@@ -194,13 +198,13 @@ export function ExperienceApp(_props: ApplicationViewProps) {
         <div className="flex items-center gap-2">
           <span className="inline-block size-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="font-medium text-fg/85">
-            {EXPERIENCES.length} Production Tenures · 3+ Years Engineering Experience
+            {experiences.length} Production Tenures · {profile.experience}
           </span>
         </div>
         <div className="hidden sm:flex items-center gap-3 text-faint">
-          <span>{PROJECTS.length} Major Architectural Systems</span>
+          <span>{projects.length} Major Architectural Systems</span>
           <span>·</span>
-          <span>{SYSTEM_PROFILE.name}</span>
+          <span>{profile.name}</span>
         </div>
       </footer>
     </div>

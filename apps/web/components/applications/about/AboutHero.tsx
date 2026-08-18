@@ -1,6 +1,6 @@
 'use client';
 
-import { ABOUT_PROFILE, MOTION, SYSTEM_PROFILE } from '@izhar-os/config';
+import { MOTION } from '@izhar-os/config';
 import { cn, StatusDot } from '@izhar-os/ui';
 import { MapPin, Terminal as TerminalIcon } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
@@ -9,6 +9,7 @@ import { useRef, type PointerEvent as ReactPointerEvent } from 'react';
 import { ACCENT_GLOW, ACCENT_LINE, ACCENT_TEXT } from '@/components/applications/about/theme';
 import { useApplicationChrome } from '@/hooks/useEnvironment';
 import { useHasFinePointer, usePrefersReducedMotion } from '@/hooks/useSystemPreferences';
+import { usePortfolioStore } from '@/lib/store/portfolio-store';
 import { useWindowStore } from '@/lib/store/window-store';
 
 /** The three technologies that sit closest to the work, floated around the plate. */
@@ -37,6 +38,9 @@ export function AboutHero() {
   const hasFinePointer = useHasFinePointer();
   const openWindow = useWindowStore((state) => state.openWindow);
 
+  const profile = usePortfolioStore((state) => state.profile);
+  const about = usePortfolioStore((state) => state.about);
+
   const interactive = hasFinePointer && !reducedMotion;
 
   const pointerX = useMotionValue(0);
@@ -63,51 +67,35 @@ export function AboutHero() {
   const handleLeave = () => {
     pointerX.set(0);
     pointerY.set(0);
+    bounds.current = null;
   };
 
   return (
     <header
-      className="relative overflow-hidden border-b border-line"
-      style={{ paddingInline: chrome.contentPadding }}
+      className={cn(
+        'relative overflow-hidden border border-line bg-surface/50 backdrop-blur-md',
+        'p-5 @min-[620px]:p-7',
+      )}
+      style={{ borderRadius: chrome.cardRadius + 4 }}
     >
-      {/* Ground: an accent pool, a technical grid, and nothing else. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background: `radial-gradient(120% 140% at 78% -20%, ${ACCENT_GLOW} 0%, transparent 58%)`,
-        }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.18]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.10) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.10) 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
-          maskImage: 'radial-gradient(90% 80% at 20% 0%, black 0%, transparent 75%)',
-          WebkitMaskImage: 'radial-gradient(90% 80% at 20% 0%, black 0%, transparent 75%)',
-        }}
-      />
-
-      <div className="relative flex flex-col-reverse items-start gap-7 py-9 @min-[620px]:flex-row @min-[620px]:items-center @min-[620px]:gap-10">
-        {/* Identity */}
+      <div className="flex flex-col gap-6 @min-[620px]:flex-row @min-[620px]:items-center @min-[620px]:justify-between">
+        {/* Pitch and status. */}
         <div className="min-w-0 flex-1">
           <motion.div
-            initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+            initial={reducedMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.42, ease: MOTION.easeOut }}
+            transition={{ duration: 0.38, ease: MOTION.easeOut }}
           >
             <p className={chrome.eyebrowClass} style={{ color: ACCENT_TEXT }}>
-              {SYSTEM_PROFILE.status.label} · {SYSTEM_PROFILE.location}
+              {profile.status.label} · {profile.location}
             </p>
 
-            <h2 className={cn('mt-3 text-fg', chrome.displayClass)}>{SYSTEM_PROFILE.name}</h2>
+            <h2 className={cn('mt-3 text-fg', chrome.displayClass)}>{profile.name}</h2>
 
-            <p className="mt-2 text-[14px] font-medium text-fg/80">{SYSTEM_PROFILE.role}</p>
+            <p className="mt-2 text-[14px] font-medium text-fg/80">{profile.role}</p>
 
             <p className="mt-4 max-w-[54ch] text-[13.5px] leading-relaxed text-muted">
-              {ABOUT_PROFILE.positioning}
+              {about.positioning}
             </p>
           </motion.div>
 
@@ -121,8 +109,8 @@ export function AboutHero() {
               className="inline-flex items-center gap-2 border px-2.5 py-1.5 text-[11.5px] text-fg/85"
               style={{ borderRadius: chrome.controlRadius, borderColor: ACCENT_LINE }}
             >
-              <StatusDot state={SYSTEM_PROFILE.status.state} />
-              {SYSTEM_PROFILE.status.detail}
+              <StatusDot state={profile.status.state} />
+              {profile.status.detail}
             </span>
 
             <button
@@ -142,7 +130,7 @@ export function AboutHero() {
 
             <span className="inline-flex items-center gap-1.5 px-1 text-[11.5px] text-faint">
               <MapPin size={12} strokeWidth={1.8} aria-hidden="true" />
-              {SYSTEM_PROFILE.location}
+              {profile.location}
             </span>
           </motion.div>
         </div>

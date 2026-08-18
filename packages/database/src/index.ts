@@ -1,16 +1,49 @@
-/**
- * Placeholder module for the future persistence layer.
- *
- * Phase 1 has no database. This file exists only to reserve the import path and
- * to record the flag that later phases will flip. See README.md in this package.
- */
+export {
+  ADMIN_SECRET_KEY,
+  checkDatabaseConnection,
+  DATABASE_ENABLED,
+  DATABASE_URL,
+  getDatabaseStatus,
+  getPgPool,
+  getSupabaseAdminClient,
+  getSupabaseClient,
+  SUPABASE_ANON_KEY,
+  SUPABASE_SERVICE_ROLE_KEY,
+  SUPABASE_URL,
+  type DatabaseStatus,
+} from './client';
 
-/** Whether a real persistence layer is wired up. Always false in Phase 1. */
-export const DATABASE_ENABLED = false;
+export { SCHEMA_SQL } from './schema';
+export { runSchemaMigration, seedAllDefaultData } from './seed';
 
-export type DatabaseStatus = 'not-configured' | 'connected' | 'error';
-
-/** Reported by System Information so the OS tells the truth about itself. */
-export function getDatabaseStatus(): DatabaseStatus {
-  return 'not-configured';
-}
+export {
+  deleteContactMessage,
+  deleteExperience,
+  deleteProject,
+  deleteProjectCategory,
+  deleteSkill,
+  deleteSkillCategory,
+  fetchAllPortfolioData,
+  fetchAboutProfile,
+  fetchContactConfig,
+  fetchContactMessages,
+  fetchExperiences,
+  fetchProjectCategories,
+  fetchProjects,
+  fetchResumeData,
+  fetchSkillCategories,
+  fetchSkills,
+  fetchSystemProfile,
+  insertContactMessage,
+  updateAboutProfile,
+  updateContactConfig,
+  updateMessageStatus,
+  updateResumeData,
+  updateSystemProfile,
+  upsertExperience,
+  upsertProject,
+  upsertProjectCategory,
+  upsertSkill,
+  upsertSkillCategory,
+  type ContactMessage,
+} from './queries';

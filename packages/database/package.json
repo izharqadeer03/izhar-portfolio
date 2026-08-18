@@ -1,8 +1,8 @@
 {
   "name": "@izhar-os/database",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "Placeholder — persistence layer for IZHAR OS. Not implemented in Phase 1.",
+  "description": "Supabase persistence layer, migrations, auto-seeder, and query services for IZHAR OS.",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
@@ -12,9 +12,16 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@izhar-os/config": "workspace:*",
+    "@izhar-os/types": "workspace:*",
+    "@supabase/supabase-js": "^2.49.1",
+    "pg": "^8.13.3"
+  },
   "devDependencies": {
     "@izhar-os/eslint-config": "workspace:*",
     "@izhar-os/tsconfig": "workspace:*",
+    "@types/pg": "^8.11.11",
     "eslint": "^9.39.5",
     "typescript": "^5.9.3"
   }

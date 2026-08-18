@@ -12,6 +12,7 @@ import { useBootSequence } from '@/hooks/useBootSequence';
 import { useEnvironmentHydration } from '@/hooks/useEnvironment';
 import { subscribeToPointer } from '@/lib/pointer';
 import { useEnvironmentStore } from '@/lib/store/environment-store';
+import { usePortfolioStore } from '@/lib/store/portfolio-store';
 import { useSystemStore } from '@/lib/store/system-store';
 import { useWindowStore } from '@/lib/store/window-store';
 
@@ -35,6 +36,7 @@ export function SystemShell() {
   const reconcileViewport = useWindowStore((state) => state.reconcileViewport);
   const hydrated = useEnvironmentStore((state) => state.hydrated);
   const hasChosen = useEnvironmentStore((state) => state.hasChosen);
+  const fetchPortfolioData = usePortfolioStore((state) => state.fetchPortfolioData);
 
   const bootVisible = phase === 'idle' || phase === 'booting';
   const desktopRevealed = phase === 'revealing' || phase === 'ready';
@@ -45,6 +47,11 @@ export function SystemShell() {
 
   // Restore the stored workspace while the boot screen is still up.
   useEnvironmentHydration();
+
+  // Hydrate dynamic portfolio data from Supabase backend in background
+  useEffect(() => {
+    fetchPortfolioData();
+  }, [fetchPortfolioData]);
 
   // One pointer listener for the whole system; the 3D rig and the parallax
   // layers both sample the same signal.

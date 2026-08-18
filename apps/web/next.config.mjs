@@ -1,3 +1,32 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const rootEnvPath = path.resolve(__dirname, '../../.env');
+
+// Prioritize root .env file across the entire application
+if (fs.existsSync(rootEnvPath)) {
+  const envContent = fs.readFileSync(rootEnvPath, 'utf-8');
+  for (const line of envContent.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const match = trimmed.match(/^([^=]+)=(.*)$/);
+    if (match) {
+      const key = match[1].trim();
+      let value = match[2].trim();
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      process.env[key] = value;
+    }
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,

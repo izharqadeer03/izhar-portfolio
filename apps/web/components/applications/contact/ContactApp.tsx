@@ -1,6 +1,6 @@
 'use client';
 
-import { CONTACT_CONFIG, SYSTEM_PROFILE } from '@izhar-os/config';
+import { SYSTEM_PROFILE } from '@izhar-os/config';
 import { cn, OSButton } from '@izhar-os/ui';
 import {
   AtSign,
@@ -19,12 +19,15 @@ import { useCallback, useState } from 'react';
 
 import type { ApplicationViewProps } from '@/components/applications/ApplicationRegistry';
 import { GithubIcon, LinkedInIcon } from '@/components/system/BrandIcons';
+import { usePortfolioStore } from '@/lib/store/portfolio-store';
 import { useToastStore } from '@/lib/store/toast-store';
 
 export function ContactApp(_props: ApplicationViewProps) {
   const addToast = useToastStore((state) => state.addToast);
+  const contactConfig = usePortfolioStore((state) => state.contactConfig);
+  const submitContact = usePortfolioStore((state) => state.submitContact);
 
-  const [selectedTopic, setSelectedTopic] = useState<string>(CONTACT_CONFIG.topics[0]?.id ?? 'job');
+  const [selectedTopic, setSelectedTopic] = useState<string>(contactConfig.topics[0]?.id ?? 'job');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
@@ -45,7 +48,7 @@ export function ContactApp(_props: ApplicationViewProps) {
 
   const [preparedDraft, setPreparedDraft] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !message.trim()) {
       addToast('Please fill in your name, email, and message.', 'warning');
@@ -54,20 +57,36 @@ export function ContactApp(_props: ApplicationViewProps) {
 
     setIsSending(true);
 
-    const topicObj = CONTACT_CONFIG.topics.find((t) => t.id === selectedTopic);
+    const topicObj = contactConfig.topics.find((t) => t.id === selectedTopic);
     const subject = encodeURIComponent(`[${topicObj?.label ?? 'Portfolio Inquiry'}] Message from ${name}`);
     const body = encodeURIComponent(
       `Hi Izhar,\n\nName: ${name}\nEmail: ${email}\nInquiry Topic: ${topicObj?.label ?? selectedTopic}\n\nMessage:\n${message}\n\n---\nSent via IZHAR OS Portfolio`,
     );
-    const mailtoUrl = `mailto:${CONTACT_CONFIG.email}?subject=${subject}&body=${body}`;
+    const mailtoUrl = `mailto:${contactConfig.email}?subject=${subject}&body=${body}`;
 
-    setTimeout(() => {
+    try {
+      const result = await submitContact({
+        name,
+        email,
+        topic: selectedTopic,
+        message,
+      });
+
       setIsSending(false);
       setIsSent(true);
       setPreparedDraft(mailtoUrl);
-      addToast('Opening email client with prepared message...', 'success');
-      window.location.href = mailtoUrl;
-    }, 600);
+
+      if (result.success) {
+        addToast('Message saved directly to database inbox!', 'success');
+      } else {
+        addToast('Message ready for dispatch via email client.', 'info');
+      }
+    } catch {
+      setIsSending(false);
+      setIsSent(true);
+      setPreparedDraft(mailtoUrl);
+      addToast('Opening mail client...', 'info');
+    }
   };
 
 
@@ -84,7 +103,7 @@ export function ContactApp(_props: ApplicationViewProps) {
 
         <div className="flex items-center gap-2 text-[11.5px] text-emerald-400">
           <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="font-medium">{CONTACT_CONFIG.availability.status} for New Roles</span>
+          <span className="font-medium">{contactConfig.availability.status} for New Roles</span>
         </div>
       </header>
 
@@ -99,10 +118,10 @@ export function ContactApp(_props: ApplicationViewProps) {
               Availability Status
             </div>
             <p className="text-[13px] font-semibold text-fg">
-              {CONTACT_CONFIG.availability.status}
+              {contactConfig.availability.status}
             </p>
             <p className="text-[12px] leading-relaxed text-muted">
-              {CONTACT_CONFIG.availability.notice}
+              {contactConfig.availability.notice}
             </p>
           </div>
 
@@ -110,11 +129,11 @@ export function ContactApp(_props: ApplicationViewProps) {
           <div className="rounded-xl border border-line bg-surface/30 p-3.5 space-y-2 text-[12px]">
             <div className="flex items-center gap-2 text-muted">
               <MapPin size={13} className="text-rose-400" />
-              <span>Location: <strong className="text-fg">{CONTACT_CONFIG.location}</strong></span>
+              <span>Location: <strong className="text-fg">{contactConfig.location}</strong></span>
             </div>
             <div className="flex items-center gap-2 text-muted">
               <Clock size={13} className="text-amber-400" />
-              <span>{CONTACT_CONFIG.timezone}</span>
+              <span>{contactConfig.timezone}</span>
             </div>
           </div>
 
@@ -125,7 +144,7 @@ export function ContactApp(_props: ApplicationViewProps) {
             </h4>
 
             <div className="space-y-1.5">
-              {CONTACT_CONFIG.channels.map((channel) => (
+              {contactConfig.channels.map((channel) => (
                 <div
                   key={channel.id}
                   className="flex items-center justify-between gap-2 rounded-xl border border-line bg-surface/30 p-2.5 hover:border-line-strong hover:bg-surface/50 transition-colors"
@@ -185,7 +204,7 @@ export function ContactApp(_props: ApplicationViewProps) {
                 Inquiry Type
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {CONTACT_CONFIG.topics.map((topic) => (
+                {contactConfig.topics.map((topic) => (
                   <button
                     key={topic.id}
                     type="button"
@@ -262,7 +281,7 @@ export function ContactApp(_props: ApplicationViewProps) {
               {isSent ? (
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="flex items-center gap-1.5 text-[12px] text-emerald-400 font-medium">
-                    <CheckCircle2 size={14} /> Ready for dispatch to {CONTACT_CONFIG.email}
+                    <CheckCircle2 size={14} /> Ready for dispatch to {contactConfig.email}
                   </div>
                   {preparedDraft ? (
                     <a
@@ -285,7 +304,7 @@ export function ContactApp(_props: ApplicationViewProps) {
                 </div>
               ) : (
                 <span className="text-[11.5px] text-faint">
-                  Direct dispatch to {CONTACT_CONFIG.email}
+                  Direct dispatch to {contactConfig.email}
                 </span>
               )}
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { ABOUT_PROFILE, MOTION } from '@izhar-os/config';
+import { MOTION } from '@izhar-os/config';
 import type { ProfileStat } from '@izhar-os/types';
 import { cn } from '@izhar-os/ui';
 import { motion } from 'motion/react';
@@ -15,6 +15,7 @@ import {
 import { ACCENT_LINE, ACCENT_WASH } from '@/components/applications/about/theme';
 import { useApplicationChrome } from '@/hooks/useEnvironment';
 import { useHasFinePointer, usePrefersReducedMotion } from '@/hooks/useSystemPreferences';
+import { usePortfolioStore } from '@/lib/store/portfolio-store';
 
 /**
  * Counts up to a figure once, on a cubic ease-out.
@@ -63,6 +64,7 @@ interface AboutStatsProps {
 export function AboutStats({ root }: AboutStatsProps) {
   const reducedMotion = usePrefersReducedMotion();
   const [seen, setSeen] = useState(false);
+  const about = usePortfolioStore((state) => state.about);
 
   return (
     <motion.ul
@@ -70,7 +72,7 @@ export function AboutStats({ root }: AboutStatsProps) {
       viewport={{ root, once: true, amount: 0.4 }}
       onViewportEnter={() => setSeen(true)}
     >
-      {ABOUT_PROFILE.stats.map((stat, index) => (
+      {about.stats.map((stat, index) => (
         <StatCard
           key={stat.id}
           stat={stat}

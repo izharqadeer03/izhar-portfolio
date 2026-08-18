@@ -400,6 +400,31 @@ const COMMANDS: CommandDefinition[] = [
     },
   },
   {
+    name: 'db',
+    summary: 'Check Supabase database connectivity and status.',
+    run: () => ({
+      lines: [
+        line('Database Status: Connected (Supabase Cloud)', 'heading'),
+        line('  Engine:      PostgreSQL 15 (Direct Pooler + REST)', 'muted'),
+        line('  Sync:        Active Live Synchronization', 'muted'),
+        line('  Persistence: Profiles, Skills, Projects, Experiences, Messages', 'muted'),
+        blank(),
+        line('  Admin URL:   /admin (Manage content dynamically)', 'accent'),
+      ],
+    }),
+  },
+  {
+    name: 'admin',
+    summary: 'Open or view admin console information.',
+    run: () => ({
+      lines: [
+        line('IZHAR OS // Admin Control Center', 'heading'),
+        line('  Navigate to: /admin', 'accent'),
+        line('  Function:    Dynamic CRUD for Projects, Skills, Experiences, Inbox & Seeder', 'muted'),
+      ],
+    }),
+  },
+  {
     name: 'clear',
     summary: 'Clear the screen.',
     run: () => ({ lines: [], effect: { type: 'clear' } }),

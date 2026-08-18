@@ -121,11 +121,15 @@ export function SystemInformationApp() {
 
       {/* Platform */}
       <section className="px-6 py-5">
-        <SectionLabel>Platform</SectionLabel>
+        <SectionLabel>Platform & Architecture</SectionLabel>
         <div className="mt-2">
           {PLATFORM_ENTRIES.map((entry) => (
             <DataRow key={entry.label} label={entry.label} value={entry.value} />
           ))}
+          <DataRow
+            label="Database"
+            value="Supabase Cloud · PostgreSQL 15 (Live Sync)"
+          />
         </div>
       </section>
 

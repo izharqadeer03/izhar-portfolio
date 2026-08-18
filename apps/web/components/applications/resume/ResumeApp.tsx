@@ -1,11 +1,5 @@
 'use client';
 
-import {
-  EXPERIENCES,
-  PROJECTS,
-  RESUME_DATA,
-  SYSTEM_PROFILE,
-} from '@izhar-os/config';
 import { OSButton } from '@izhar-os/ui';
 import {
   Check,
@@ -24,10 +18,16 @@ import { useCallback, useRef, useState } from 'react';
 
 import type { ApplicationViewProps } from '@/components/applications/ApplicationRegistry';
 import { GithubIcon, LinkedInIcon } from '@/components/system/BrandIcons';
+import { usePortfolioStore } from '@/lib/store/portfolio-store';
 import { useToastStore } from '@/lib/store/toast-store';
 
 export function ResumeApp(_props: ApplicationViewProps) {
   const addToast = useToastStore((state) => state.addToast);
+  const resume = usePortfolioStore((state) => state.resume);
+  const experiences = usePortfolioStore((state) => state.experiences);
+  const projects = usePortfolioStore((state) => state.projects);
+  const profile = usePortfolioStore((state) => state.profile);
+
   const [zoom, setZoom] = useState(100);
   const [copied, setCopied] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
@@ -48,13 +48,13 @@ export function ResumeApp(_props: ApplicationViewProps) {
   }, [addToast]);
 
   const handleCopyText = useCallback(() => {
-    const summary = `${RESUME_DATA.name} — ${RESUME_DATA.title}\nEmail: ${RESUME_DATA.email} | Location: ${RESUME_DATA.location}\n\nSummary:\n${RESUME_DATA.summary}`;
+    const summary = `${profile.name} — ${profile.role}\nEmail: ${profile.links.find((l) => l.id === 'email')?.href.replace('mailto:', '') || ''} | Location: ${profile.location}\n\nSummary:\n${resume.summary}`;
     navigator.clipboard.writeText(summary).then(() => {
       setCopied(true);
       addToast('Resume summary copied to clipboard.', 'info');
       setTimeout(() => setCopied(false), 2000);
     });
-  }, [addToast]);
+  }, [addToast, profile, resume.summary]);
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-void/90 select-none @container">
@@ -118,46 +118,45 @@ export function ResumeApp(_props: ApplicationViewProps) {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h1 className="text-[24px] sm:text-[28px] font-extrabold tracking-tight text-white">
-                  {RESUME_DATA.name}
+                  {profile.name}
                 </h1>
                 <p className="text-[14px] font-semibold text-emerald-400 mt-0.5">
-                  {RESUME_DATA.title}
+                  {profile.role}
                 </p>
               </div>
 
               <div className="flex flex-col items-start sm:items-end gap-1 text-[12px] text-muted">
                 <span className="flex items-center gap-1.5">
                   <Mail size={12} className="text-faint" />
-                  {RESUME_DATA.email}
+                  {profile.links.find((l) => l.id === 'email')?.href.replace('mailto:', '') || 'izharqadeer03@gmail.com'}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <MapPin size={12} className="text-faint" />
-                  {RESUME_DATA.location}
+                  {profile.location}
                 </span>
               </div>
             </div>
 
             {/* Social / Portfolio links */}
             <div className="flex flex-wrap items-center gap-3 pt-1 text-[12px]">
-              <a
-                href="https://github.com/izharqadeer03"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="flex items-center gap-1 text-muted hover:text-white transition-colors"
-              >
-                <GithubIcon size={13} />
-                <span>github.com/izharqadeer03</span>
-              </a>
-              <span>·</span>
-              <a
-                href="https://linkedin.com/in/izharqadeer"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="flex items-center gap-1 text-muted hover:text-white transition-colors"
-              >
-                <LinkedInIcon size={13} />
-                <span>linkedin.com/in/izharqadeer</span>
-              </a>
+              {profile.links.map((link) => (
+                <a
+                  key={link.id}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="flex items-center gap-1 text-muted hover:text-white transition-colors"
+                >
+                  {link.id === 'github' ? (
+                    <GithubIcon size={13} />
+                  ) : link.id === 'linkedin' ? (
+                    <LinkedInIcon size={13} />
+                  ) : (
+                    <Mail size={13} />
+                  )}
+                  <span>{link.label}</span>
+                </a>
+              ))}
             </div>
           </header>
 
@@ -166,23 +165,25 @@ export function ResumeApp(_props: ApplicationViewProps) {
             <h2 className="text-[12px] font-bold tracking-[0.14em] text-emerald-400 uppercase">
               Executive Summary
             </h2>
-            <p className="text-[13px] leading-relaxed text-fg/90">{RESUME_DATA.summary}</p>
+            <p className="text-[13px] leading-relaxed text-fg/90">{resume.summary}</p>
           </section>
 
           {/* Core Competencies Matrix */}
-          <section className="space-y-3">
-            <h2 className="text-[12px] font-bold tracking-[0.14em] text-emerald-400 uppercase">
-              Technical Competencies
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12.5px]">
-              {RESUME_DATA.competencies.map((comp) => (
-                <div key={comp.category} className="rounded-lg border border-line/60 bg-void/30 p-2.5">
-                  <span className="font-semibold text-fg/90">{comp.category}:</span>{' '}
-                  <span className="text-muted">{comp.skills.join(', ')}</span>
-                </div>
-              ))}
-            </div>
-          </section>
+          {resume.competencies && resume.competencies.length > 0 ? (
+            <section className="space-y-3">
+              <h2 className="text-[12px] font-bold tracking-[0.14em] text-emerald-400 uppercase">
+                Technical Competencies
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12.5px]">
+                {resume.competencies.map((comp) => (
+                  <div key={comp.category} className="rounded-lg border border-line/60 bg-void/30 p-2.5">
+                    <span className="font-semibold text-fg/90">{comp.category}:</span>{' '}
+                    <span className="text-muted">{comp.skills.join(', ')}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           {/* Professional Experience */}
           <section className="space-y-5">
@@ -191,7 +192,7 @@ export function ResumeApp(_props: ApplicationViewProps) {
             </h2>
 
             <div className="space-y-5">
-              {EXPERIENCES.map((exp) => (
+              {experiences.map((exp) => (
                 <div key={exp.id} className="space-y-2">
                   <div className="flex flex-wrap items-baseline justify-between gap-1">
                     <div>
@@ -224,7 +225,7 @@ export function ResumeApp(_props: ApplicationViewProps) {
               Selected Featured Systems
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {PROJECTS.slice(0, 4).map((p) => (
+              {projects.slice(0, 4).map((p) => (
                 <div key={p.id} className="rounded-xl border border-line/70 bg-surface/20 p-3 space-y-1.5">
                   <h3 className="text-[13px] font-bold text-white">{p.name}</h3>
                   <p className="text-[11.5px] text-muted leading-snug">{p.shortDescription}</p>
@@ -246,7 +247,7 @@ export function ResumeApp(_props: ApplicationViewProps) {
               <h2 className="text-[12px] font-bold tracking-[0.14em] text-emerald-400 uppercase flex items-center gap-1.5">
                 <GraduationCap size={13} /> Education
               </h2>
-              {RESUME_DATA.education.map((edu, idx) => (
+              {resume.education.map((edu, idx) => (
                 <div key={idx} className="text-[12px]">
                   <h3 className="font-bold text-white">{edu.degree}</h3>
                   <p className="text-muted">{edu.institution}</p>
@@ -260,7 +261,7 @@ export function ResumeApp(_props: ApplicationViewProps) {
                 <Sparkles size={13} /> Certifications
               </h2>
               <ul className="space-y-1.5 text-[12px]">
-                {RESUME_DATA.certifications.map((cert, idx) => (
+                {resume.certifications.map((cert, idx) => (
                   <li key={idx} className="text-muted">
                     <span className="font-medium text-white">{cert.name}</span> — {cert.issuer} ({cert.year})
                   </li>
@@ -275,7 +276,7 @@ export function ResumeApp(_props: ApplicationViewProps) {
       <footer className="flex shrink-0 items-center justify-between border-t border-line px-3 py-1.5 text-[11.5px] text-muted">
         <span>A4 Format · Ready for Print & PDF Export</span>
         <span className="hidden sm:block text-faint">
-          {SYSTEM_PROFILE.name} · {SYSTEM_PROFILE.role}
+          {profile.name} · {profile.role}
         </span>
       </footer>
     </div>
